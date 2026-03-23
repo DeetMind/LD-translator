@@ -1,0 +1,10 @@
+{
+  "deductible_usd": 250000,
+  "attachment_points_usd": [500000, 1000000, 5000000, 10000000],
+  "reinsurance_layers": [
+    {"attach_usd": 1000000, "limit_usd": 4000000},
+    {"attach_usd": 5000000, "limit_usd": 10000000},
+    {"attach_usd": 15000000, "limit_usd": 15000000}
+  ],
+  "capital_thresholds_usd": [5000000, 10000000, 20000000, 40000000]
+}

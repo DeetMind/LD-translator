@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Loss Distribution Translator</title>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --panel: #ffffff;
+    --border: #dde1e8;
+    --accent: #1a56db;
+    --accent-light: #e8f0fe;
+    --green: #0e9f6e;
+    --red: #e02424;
+    --text: #1a1f36;
+    --muted: #6b7280;
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: var(--bg); color: var(--text); font-size: 14px; }
+
+  header { background: var(--accent); color: #fff; padding: 14px 24px;
+           display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header span { font-size: 12px; opacity: 0.8; }
+
+  .layout { display: grid; grid-template-columns: 360px 1fr; gap: 16px;
+            padding: 16px; min-height: calc(100vh - 52px); }
+
+  /* ── Left panel ── */
+  .left-panel { display: flex; flex-direction: column; gap: 12px; }
+
+  .card { background: var(--panel); border: 1px solid var(--border);
+          border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+  .card h2 { font-size: 13px; font-weight: 600; text-transform: uppercase;
+             letter-spacing: .05em; color: var(--muted); margin-bottom: 12px; }
+
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--muted);
+          margin-bottom: 3px; margin-top: 8px; }
+  label:first-of-type { margin-top: 0; }
+  input[type=text], input[type=number], input[type=file] {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--border);
+    border-radius: 5px; font-size: 13px; background: #fafbfc; }
+  input:focus { outline: 2px solid var(--accent); border-color: transparent; }
+
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .layer-row { display: grid; grid-template-columns: 1fr 1fr 24px; gap: 6px;
+               align-items: end; margin-bottom: 6px; }
+  .layer-row input { margin-top: 0; }
+  .del-btn { background: none; border: none; color: var(--red); font-size: 16px;
+             cursor: pointer; padding: 4px; line-height: 1; }
+  .add-btn { font-size: 12px; color: var(--accent); background: none; border: none;
+             cursor: pointer; padding: 4px 0; display: flex; align-items: center; gap: 4px; }
+  .add-btn:hover { text-decoration: underline; }
+
+  .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+                    border: 1px solid var(--border); border-radius: 5px;
+                    padding: 6px 8px; background: #fafbfc; min-height: 36px; }
+  .tag { background: var(--accent-light); color: var(--accent); padding: 2px 8px;
+         border-radius: 12px; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .tag button { background: none; border: none; cursor: pointer; color: var(--accent);
+                font-size: 12px; line-height: 1; padding: 0; }
+  .tag-input-wrap input { border: none; outline: none; background: transparent;
+                          font-size: 13px; min-width: 80px; flex: 1; padding: 0; }
+
+  .run-btn { width: 100%; padding: 10px; background: var(--accent); color: #fff;
+             border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600;
+             cursor: pointer; margin-top: 4px; }
+  .run-btn:hover { background: #1648c0; }
+  .run-btn:disabled { background: #9ab0f5; cursor: not-allowed; }
+
+  .load-sample-btn { width: 100%; padding: 7px; background: #fff; color: var(--accent);
+                     border: 1px solid var(--accent); border-radius: var(--radius);
+                     font-size: 13px; cursor: pointer; margin-top: 6px; }
+  .load-sample-btn:hover { background: var(--accent-light); }
+
+  /* ── Right panel ── */
+  .right-panel { display: flex; flex-direction: column; gap: 14px; }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .kpi-card { background: var(--panel); border: 1px solid var(--border);
+              border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .kpi-card .label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+                     color: var(--muted); margin-bottom: 4px; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; }
+  .kpi-card .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .delta-good { color: var(--green); }
+  .delta-bad  { color: var(--red); }
+  .delta-neutral { color: var(--muted); }
+
+  .chart-card { background: var(--panel); border: 1px solid var(--border);
+                border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+  .chart-card h2 { font-size: 13px; font-weight: 600; text-transform: uppercase;
+                   letter-spacing: .05em; color: var(--muted); margin-bottom: 10px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #f8f9fb; text-align: left; padding: 7px 10px; font-size: 11px;
+       text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+       border-bottom: 1px solid var(--border); }
+  td { padding: 7px 10px; border-bottom: 1px solid #f0f2f5; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfc; }
+
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: #d1fae5; color: #065f46; }
+  .badge-yellow { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fee2e2; color: #991b1b; }
+
+  .export-row { display: flex; gap: 10px; justify-content: flex-end; }
+  .export-btn { padding: 7px 14px; border: 1px solid var(--border); border-radius: 5px;
+                background: #fff; font-size: 12px; cursor: pointer; }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .method-note { background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius);
+                 padding: 14px 16px; }
+  .method-note h3 { font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 8px; }
+  .method-note p, .method-note li { font-size: 12px; color: #78350f; line-height: 1.6; }
+  .method-note ul { padding-left: 18px; }
+
+  .placeholder { display: flex; align-items: center; justify-content: center;
+                 min-height: 200px; color: var(--muted); font-size: 13px; }
+  .spinner { border: 3px solid #e5e7eb; border-top-color: var(--accent);
+             border-radius: 50%; width: 24px; height: 24px; animation: spin .7s linear infinite;
+             margin-right: 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-banner { background: #fee2e2; border: 1px solid #fca5a5; border-radius: var(--radius);
+                  padding: 12px 16px; color: var(--red); font-size: 13px; }
+
+  .file-name { font-size: 11px; color: var(--green); margin-top: 4px; }
+
+  /* tabs for event table */
+  .tab-bar { display: flex; gap: 2px; margin-bottom: 10px; }
+  .tab { padding: 5px 12px; border: 1px solid var(--border); border-radius: 5px 5px 0 0;
+         background: #f8f9fb; cursor: pointer; font-size: 12px; }
+  .tab.active { background: #fff; border-bottom-color: #fff; font-weight: 600; color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Loss Distribution Translator</h1>
+    <span>Physical mitigation → insurance metrics</span>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ════════════════ LEFT PANEL ════════════════ -->
+  <div class="left-panel">
+
+    <!-- Event loss table upload -->
+    <div class="card">
+      <h2>1 · Event Loss Table</h2>
+      <label>Upload CSV (event_id, annual_probability, return_period, flood_depth_ft, gross_loss_usd)</label>
+      <input type="file" id="csvFile" accept=".csv" onchange="onCsvChange(this)" />
+      <div class="file-name" id="csvFileName"></div>
+    </div>
+
+    <!-- Mitigation parameters -->
+    <div class="card">
+      <h2>2 · Mitigation Parameters</h2>
+      <label>Project Name</label>
+      <input type="text" id="project_name" value="Riverside Flood Barrier Phase 1" />
+      <div class="row2">
+        <div>
+          <label>Design Height (ft)</label>
+          <input type="number" id="design_height_ft" value="8.0" step="0.1" />
+        </div>
+        <div>
+          <label>Freeboard (ft)</label>
+          <input type="number" id="freeboard_ft" value="1.5" step="0.1" />
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Protected Loss Reduction (%)</label>
+          <input type="number" id="protected_loss_reduction_pct" value="75" min="0" max="100" step="1" />
+        </div>
+        <div>
+          <label>Overtop Loss Reduction (%)</label>
+          <input type="number" id="overtop_loss_reduction_pct" value="15" min="0" max="100" step="1" />
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label>Failure Probability (%)</label>
+          <input type="number" id="failure_probability" value="5" min="0" max="100" step="0.1" />
+        </div>
+        <div>
+          <label>Maintenance Haircut (%)</label>
+          <input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Insurance structure -->
+    <div class="card">
+      <h2>3 · Insurance Structure</h2>
+      <label>Deductible (USD)</label>
+      <input type="number" id="deductible_usd" value="250000" step="50000" />
+
+      <label>Attachment Points (USD) — press Enter to add</label>
+      <div class="tag-input-wrap" id="attachWrap" onclick="document.getElementById('attachInput').focus()">
+        <input type="number" id="attachInput" placeholder="e.g. 1000000"
+               onkeydown="addTag('attachWrap','attachInput','attachTags', event)" />
+      </div>
+
+      <label style="margin-top:12px">Reinsurance Layers</label>
+      <div id="layersContainer"></div>
+      <button class="add-btn" onclick="addLayer()">＋ Add layer</button>
+
+      <label style="margin-top:12px">Capital Thresholds (USD) — press Enter to add</label>
+      <div class="tag-input-wrap" id="capitalWrap" onclick="document.getElementById('capitalInput').focus()">
+        <input type="number" id="capitalInput" placeholder="e.g. 10000000"
+               onkeydown="addTag('capitalWrap','capitalInput','capitalTags', event)" />
+      </div>
+    </div>
+
+    <button class="load-sample-btn" onclick="loadSample()">⬇ Load Sample Scenario</button>
+    <button class="run-btn" id="runBtn" onclick="runAnalysis()" disabled>Run Analysis</button>
+    <div id="errorBanner" style="display:none"></div>
+  </div>
+
+  <!-- ════════════════ RIGHT PANEL ════════════════ -->
+  <div class="right-panel" id="rightPanel">
+
+    <!-- Method notes always visible -->
+    <div class="method-note">
+      <h3>Method Notes</h3>
+      <ul>
+        <li>This is a <strong>translation prototype</strong>, not a full catastrophe model. It does not generate new event scenarios.</li>
+        <li>It applies a physical mitigation logic to an <strong>existing event set</strong> (your uploaded CSV) to produce adjusted losses.</li>
+        <li>The purpose is to show how a flood-control intervention changes <strong>insurance-relevant metrics</strong>: EAL, EP curve, PML, layer pricing, and capital exposure.</li>
+        <li>Results are indicative only. Consult a licensed actuary or cat model vendor for binding decisions.</li>
+      </ul>
+    </div>
+
+    <div id="results">
+      <div class="card placeholder">Upload a CSV and click <strong>&nbsp;Run Analysis&nbsp;</strong> to see results.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const attachTags = [];
+const capitalTags = [];
+let csvB64 = null;
+let lastResult = null;
+
+// ── Tag input helpers ──────────────────────────────────────────────────────
+function addTag(wrapId, inputId, arr, event) {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  const input = document.getElementById(inputId);
+  const val = parseFloat(input.value.replace(/,/g, ''));
+  if (isNaN(val) || val <= 0) return;
+  arr.push(val);
+  arr.sort((a, b) => a - b);
+  renderTags(wrapId, inputId, arr);
+  input.value = '';
+}
+
+function removeTag(wrapId, inputId, arr, idx) {
+  arr.splice(idx, 1);
+  renderTags(wrapId, inputId, arr);
+}
+
+function renderTags(wrapId, inputId, arr) {
+  const wrap = document.getElementById(wrapId);
+  const input = document.getElementById(inputId);
+  // Remove old tags
+  wrap.querySelectorAll('.tag').forEach(t => t.remove());
+  arr.forEach((v, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `${fmtUSD(v)} <button onclick="removeTag('${wrapId}','${inputId}',${wrapId==='attachWrap'?'attachTags':'capitalTags'},${i})">×</button>`;
+    wrap.insertBefore(tag, input);
+  });
+}
+
+// ── Layer helpers ──────────────────────────────────────────────────────────
+let layerCount = 0;
+function addLayer(attach = '', limit = '') {
+  const id = layerCount++;
+  const container = document.getElementById('layersContainer');
+  const row = document.createElement('div');
+  row.className = 'layer-row';
+  row.id = `layer_${id}`;
+  row.innerHTML = `
+    <div>
+      ${id === 0 ? '<label>Attach (USD)</label>' : ''}
+      <input type="number" id="layer_attach_${id}" value="${attach}" placeholder="Attach" />
+    </div>
+    <div>
+      ${id === 0 ? '<label>Limit (USD)</label>' : ''}
+      <input type="number" id="layer_limit_${id}" value="${limit}" placeholder="Limit" />
+    </div>
+    <button class="del-btn" onclick="removeLayer('layer_${id}')">×</button>`;
+  container.appendChild(row);
+}
+
+function removeLayer(id) {
+  document.getElementById(id)?.remove();
+}
+
+function getLayers() {
+  const rows = document.querySelectorAll('#layersContainer .layer-row');
+  const layers = [];
+  rows.forEach(row => {
+    const id = row.id.replace('layer_', '');
+    const a = parseFloat(document.getElementById(`layer_attach_${id}`)?.value || 0);
+    const l = parseFloat(document.getElementById(`layer_limit_${id}`)?.value || 0);
+    if (!isNaN(a) && !isNaN(l) && a >= 0 && l > 0) {
+      layers.push({ attach_usd: a, limit_usd: l });
+    }
+  });
+  return layers;
+}
+
+// ── CSV upload ─────────────────────────────────────────────────────────────
+function onCsvChange(input) {
+  const file = input.files[0];
+  if (!file) return;
+  document.getElementById('csvFileName').textContent = `✓ ${file.name}`;
+  const reader = new FileReader();
+  reader.onload = e => {
+    csvB64 = btoa(unescape(encodeURIComponent(e.target.result)));
+    document.getElementById('runBtn').disabled = false;
+  };
+  reader.readAsText(file);
+}
+
+// ── Load sample ────────────────────────────────────────────────────────────
+async function loadSample() {
+  const res = await fetch('/api/sample-data');
+  if (!res.ok) { alert('Could not load sample data'); return; }
+  const data = await res.json();
+
+  // Encode CSV
+  csvB64 = btoa(unescape(encodeURIComponent(data.csv)));
+  document.getElementById('csvFileName').textContent = '✓ example_events.csv (sample)';
+  document.getElementById('runBtn').disabled = false;
+
+  // Fill mitigation
+  const m = data.mitigation;
+  document.getElementById('project_name').value = m.project_name;
+  document.getElementById('design_height_ft').value = m.design_height_ft;
+  document.getElementById('freeboard_ft').value = m.freeboard_ft;
+  document.getElementById('protected_loss_reduction_pct').value = m.protected_loss_reduction_pct * 100;
+  document.getElementById('overtop_loss_reduction_pct').value = m.overtop_loss_reduction_pct * 100;
+  document.getElementById('failure_probability').value = m.failure_probability * 100;
+  document.getElementById('maintenance_haircut_pct').value = m.maintenance_haircut_pct * 100;
+
+  // Fill insurance
+  const ins = data.insurance;
+  document.getElementById('deductible_usd').value = ins.deductible_usd;
+
+  // Attachment points
+  attachTags.length = 0;
+  ins.attachment_points_usd.forEach(v => attachTags.push(v));
+  attachTags.sort((a, b) => a - b);
+  renderTags('attachWrap', 'attachInput', attachTags);
+
+  // Capital thresholds
+  capitalTags.length = 0;
+  ins.capital_thresholds_usd.forEach(v => capitalTags.push(v));
+  capitalTags.sort((a, b) => a - b);
+  renderTags('capitalWrap', 'capitalInput', capitalTags);
+
+  // Layers
+  document.getElementById('layersContainer').innerHTML = '';
+  layerCount = 0;
+  ins.reinsurance_layers.forEach(l => addLayer(l.attach_usd, l.limit_usd));
+}
+
+// ── Run analysis ───────────────────────────────────────────────────────────
+async function runAnalysis() {
+  const btn = document.getElementById('runBtn');
+  const errBanner = document.getElementById('errorBanner');
+  errBanner.style.display = 'none';
+
+  if (!csvB64) { showError('Please upload a CSV file first.'); return; }
+
+  const payload = {
+    events_csv_b64: csvB64,
+    mitigation: {
+      project_name: document.getElementById('project_name').value,
+      design_height_ft: parseFloat(document.getElementById('design_height_ft').value),
+      freeboard_ft: parseFloat(document.getElementById('freeboard_ft').value),
+      protected_loss_reduction_pct: parseFloat(document.getElementById('protected_loss_reduction_pct').value) / 100,
+      overtop_loss_reduction_pct: parseFloat(document.getElementById('overtop_loss_reduction_pct').value) / 100,
+      failure_probability: parseFloat(document.getElementById('failure_probability').value) / 100,
+      maintenance_haircut_pct: parseFloat(document.getElementById('maintenance_haircut_pct').value) / 100,
+    },
+    insurance: {
+      deductible_usd: parseFloat(document.getElementById('deductible_usd').value),
+      attachment_points_usd: [...attachTags],
+      reinsurance_layers: getLayers(),
+      capital_thresholds_usd: [...capitalTags],
+    }
+  };
+
+  // Show spinner
+  document.getElementById('results').innerHTML = `
+    <div class="card placeholder"><div class="spinner"></div> Computing…</div>`;
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Server error');
+    }
+    lastResult = await res.json();
+    renderResults(lastResult);
+  } catch(e) {
+    showError(e.message);
+    document.getElementById('results').innerHTML =
+      '<div class="card placeholder">Fix errors and try again.</div>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ── Render results ─────────────────────────────────────────────────────────
+function renderResults(r) {
+  const k = r.kpis;
+  document.getElementById('results').innerHTML = `
+    <!-- KPI cards -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- EP Curve -->
+    <div class="chart-card">
+      <h2>Exceedance Probability Curve</h2>
+      <div id="epChart" style="height:320px"></div>
+    </div>
+
+    <!-- Tables row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="chart-card">
+        <h2>Attachment Probabilities</h2>
+        <table id="attachTable"></table>
+      </div>
+      <div class="chart-card">
+        <h2>Capital Threshold Exceedance</h2>
+        <table id="capitalTable"></table>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h2>Reinsurance Layer Metrics</h2>
+      <table id="layerTable"></table>
+    </div>
+
+    <!-- Event table -->
+    <div class="chart-card">
+      <h2>Event-Level Detail</h2>
+      <div style="overflow-x:auto"><table id="eventTable"></table></div>
+    </div>
+
+    <!-- Export -->
+    <div class="export-row">
+      <button class="export-btn" onclick="exportCSV()">⬇ Export Event CSV</button>
+      <button class="export-btn" onclick="exportJSON()">⬇ Export Summary JSON</button>
+    </div>
+  `;
+
+  // ── KPI cards
+  const kpis = [
+    { label: 'Baseline EAL', value: fmtUSD(k.baseline_eal), sub: 'annual expected loss' },
+    { label: 'Mitigated EAL', value: fmtUSD(k.mitigated_eal), sub: 'after mitigation', delta: -k.eal_reduction_pct },
+    { label: 'EAL Reduction', value: fmtPct(k.eal_reduction_pct), sub: '', deltaClass: k.eal_reduction_pct > 0 ? 'delta-good' : 'delta-bad' },
+    { label: 'Baseline 1-in-100 PML', value: fmtUSD(k.baseline_pml_100), sub: '100-yr return period' },
+    { label: 'Mitigated 1-in-100 PML', value: fmtUSD(k.mitigated_pml_100), sub: '', delta: -k.pml_100_reduction_pct },
+    { label: 'Baseline 1-in-250 PML', value: fmtUSD(k.baseline_pml_250), sub: '250-yr return period' },
+    { label: 'Mitigated 1-in-250 PML', value: fmtUSD(k.mitigated_pml_250), sub: '', delta: -k.pml_250_reduction_pct },
+  ];
+
+  const kpiGrid = document.getElementById('kpiGrid');
+  kpis.forEach(kpi => {
+    const card = document.createElement('div');
+    card.className = 'kpi-card';
+    let deltaHtml = '';
+    if (kpi.delta !== undefined) {
+      const cls = kpi.delta < 0 ? 'delta-good' : 'delta-bad';
+      const sign = kpi.delta < 0 ? '▼' : '▲';
+      deltaHtml = `<div class="sub ${cls}">${sign} ${Math.abs(kpi.delta).toFixed(1)}% vs baseline</div>`;
+    }
+    card.innerHTML = `
+      <div class="label">${kpi.label}</div>
+      <div class="value ${kpi.deltaClass||''}">${kpi.value}</div>
+      ${kpi.sub ? `<div class="sub">${kpi.sub}</div>` : ''}
+      ${deltaHtml}`;
+    kpiGrid.appendChild(card);
+  });
+
+  // ── EP chart
+  const ep_b = r.ep_curves.baseline;
+  const ep_m = r.ep_curves.mitigated;
+
+  Plotly.newPlot('epChart', [
+    {
+      x: ep_b.exceedance_probability, y: ep_b.loss_usd,
+      mode: 'lines+markers', name: 'Baseline',
+      line: { color: '#e02424', width: 2 },
+      marker: { size: 5 },
+      hovertemplate: 'EP: %{x:.4f}<br>Loss: $%{y:,.0f}<extra>Baseline</extra>'
+    },
+    {
+      x: ep_m.exceedance_probability, y: ep_m.loss_usd,
+      mode: 'lines+markers', name: 'Mitigated',
+      line: { color: '#0e9f6e', width: 2, dash: 'dash' },
+      marker: { size: 5 },
+      hovertemplate: 'EP: %{x:.4f}<br>Loss: $%{y:,.0f}<extra>Mitigated</extra>'
+    }
+  ], {
+    xaxis: { title: 'Annual Exceedance Probability', tickformat: '.3f' },
+    yaxis: { title: 'Loss (USD)', tickformat: '$,.0f' },
+    legend: { x: 0.7, y: 0.95 },
+    margin: { t: 10, r: 20, b: 50, l: 90 },
+    plot_bgcolor: '#fff', paper_bgcolor: '#fff',
+  }, { responsive: true });
+
+  // ── Attachment table
+  buildAttachTable(r.attachment_probabilities, 'attachTable');
+
+  // ── Capital table
+  buildCapitalTable(r.capital_thresholds, 'capitalTable');
+
+  // ── Layer table
+  buildLayerTable(r.reinsurance_layers, 'layerTable');
+
+  // ── Event table
+  buildEventTable(r.event_table, 'eventTable');
+}
+
+function buildAttachTable(data, tableId) {
+  const tbl = document.getElementById(tableId);
+  tbl.innerHTML = `<tr>
+    <th>Attachment</th><th>Baseline EP</th><th>Mitigated EP</th><th>Change</th>
+  </tr>`;
+  const n = data.baseline.length;
+  for (let i = 0; i < n; i++) {
+    const b = data.baseline[i];
+    const m = data.mitigated[i];
+    const delta = m.exceedance_probability - b.exceedance_probability;
+    const cls = delta < 0 ? 'badge-green' : delta > 0 ? 'badge-red' : 'badge-yellow';
+    tbl.innerHTML += `<tr>
+      <td>${fmtUSD(b.attachment_usd)}</td>
+      <td>${fmtEP(b.exceedance_probability)}</td>
+      <td>${fmtEP(m.exceedance_probability)}</td>
+      <td><span class="badge ${cls}">${delta < 0 ? '▼' : delta > 0 ? '▲' : '—'} ${Math.abs(delta*100).toFixed(3)}%</span></td>
+    </tr>`;
+  }
+}
+
+function buildCapitalTable(data, tableId) {
+  const tbl = document.getElementById(tableId);
+  tbl.innerHTML = `<tr>
+    <th>Threshold</th><th>Baseline EP</th><th>Mitigated EP</th><th>Change</th>
+  </tr>`;
+  const n = data.baseline.length;
+  for (let i = 0; i < n; i++) {
+    const b = data.baseline[i];
+    const m = data.mitigated[i];
+    const delta = m.exceedance_probability - b.exceedance_probability;
+    const cls = delta < 0 ? 'badge-green' : delta > 0 ? 'badge-red' : 'badge-yellow';
+    tbl.innerHTML += `<tr>
+      <td>${fmtUSD(b.threshold_usd)}</td>
+      <td>${fmtEP(b.exceedance_probability)}</td>
+      <td>${fmtEP(m.exceedance_probability)}</td>
+      <td><span class="badge ${cls}">${delta < 0 ? '▼' : delta > 0 ? '▲' : '—'} ${Math.abs(delta*100).toFixed(3)}%</span></td>
+    </tr>`;
+  }
+}
+
+function buildLayerTable(data, tableId) {
+  const tbl = document.getElementById(tableId);
+  tbl.innerHTML = `<tr>
+    <th>Layer (Attach xs Limit)</th>
+    <th>Baseline ELL</th><th>Baseline LOL</th>
+    <th>Mitigated ELL</th><th>Mitigated LOL</th>
+    <th>ELL Reduction</th>
+  </tr>`;
+  const n = data.baseline.length;
+  for (let i = 0; i < n; i++) {
+    const b = data.baseline[i];
+    const m = data.mitigated[i];
+    const delta = b.expected_layer_loss_usd > 0
+      ? (b.expected_layer_loss_usd - m.expected_layer_loss_usd) / b.expected_layer_loss_usd * 100
+      : 0;
+    const cls = delta > 0 ? 'badge-green' : 'badge-yellow';
+    tbl.innerHTML += `<tr>
+      <td>${fmtUSD(b.attach_usd)} xs ${fmtUSD(b.limit_usd)}</td>
+      <td>${fmtUSD(b.expected_layer_loss_usd)}</td>
+      <td>${(b.loss_on_line_pct*100).toFixed(2)}%</td>
+      <td>${fmtUSD(m.expected_layer_loss_usd)}</td>
+      <td>${(m.loss_on_line_pct*100).toFixed(2)}%</td>
+      <td><span class="badge ${cls}">▼ ${delta.toFixed(1)}%</span></td>
+    </tr>`;
+  }
+}
+
+function buildEventTable(rows, tableId) {
+  const tbl = document.getElementById(tableId);
+  tbl.innerHTML = `<tr>
+    <th>Event</th><th>Ann. Prob</th><th>RP (yr)</th>
+    <th>Depth (ft)</th><th>Gross Loss</th><th>Mitigated Loss</th>
+    <th>Reduction</th><th>Reduction %</th>
+  </tr>`;
+  rows.forEach(r => {
+    tbl.innerHTML += `<tr>
+      <td>${r.event_id}</td>
+      <td>${r.annual_probability.toFixed(4)}</td>
+      <td>${r.return_period}</td>
+      <td>${r.flood_depth_ft.toFixed(1)}</td>
+      <td>${fmtUSD(r.gross_loss_usd)}</td>
+      <td>${fmtUSD(r.final_loss)}</td>
+      <td>${fmtUSD(r.loss_reduction_usd)}</td>
+      <td>${r.loss_reduction_pct.toFixed(1)}%</td>
+    </tr>`;
+  });
+}
+
+// ── Exports ────────────────────────────────────────────────────────────────
+function exportJSON() {
+  if (!lastResult) return;
+  const blob = new Blob([JSON.stringify(lastResult, null, 2)], { type: 'application/json' });
+  downloadBlob(blob, 'ldt_summary.json');
+}
+
+function exportCSV() {
+  if (!lastResult) return;
+  const rows = lastResult.event_table;
+  const headers = Object.keys(rows[0]);
+  const lines = [headers.join(',')];
+  rows.forEach(r => lines.push(headers.map(h => r[h]).join(',')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  downloadBlob(blob, 'ldt_events.csv');
+}
+
+function downloadBlob(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+}
+
+// ── Formatting helpers ─────────────────────────────────────────────────────
+function fmtUSD(v) {
+  if (v === undefined || v === null) return '—';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(1) + 'K';
+  return '$' + v.toFixed(0);
+}
+function fmtPct(v) { return (v || 0).toFixed(1) + '%'; }
+function fmtEP(v) { return (v*100).toFixed(3) + '%'; }
+
+function showError(msg) {
+  const b = document.getElementById('errorBanner');
+  b.innerHTML = `<div class="error-banner">⚠ ${msg}</div>`;
+  b.style.display = 'block';
+}
+
+// ── Init: add default layers and tags ─────────────────────────────────────
+(function init() {
+  addLayer(1000000, 4000000);
+  addLayer(5000000, 10000000);
+  addLayer(15000000, 15000000);
+  [500000, 1000000, 5000000, 10000000].forEach(v => attachTags.push(v));
+  renderTags('attachWrap', 'attachInput', attachTags);
+  [5000000, 10000000, 20000000, 40000000].forEach(v => capitalTags.push(v));
+  renderTags('capitalWrap', 'capitalInput', capitalTags);
+})();
+</script>
+</body>
+</html>

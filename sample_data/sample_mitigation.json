@@ -1,0 +1,9 @@
+{
+  "project_name": "Riverside Flood Barrier Phase 1",
+  "design_height_ft": 8.0,
+  "freeboard_ft": 1.5,
+  "protected_loss_reduction_pct": 0.75,
+  "overtop_loss_reduction_pct": 0.15,
+  "failure_probability": 0.05,
+  "maintenance_haircut_pct": 0.10
+}
