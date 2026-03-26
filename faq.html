@@ -57,7 +57,7 @@
 
   <div class="faq-item">
     <h3>1. Where are your input data coming from, and what makes them defensible?</h3>
-    <p>Right now this is a calculation engine only, using dummy data. Defensibility would come from whatever event-loss table the user provides. In practice it should come from a licensed cat model (RMS, AIR) or validated public model (FEMA, USACE). I'd welcome input on which models to ingest for which interventions and assets.</p>
+    <p>Right now this is a calculation engine only, using dummy data. Defensibility would come from whatever event-loss table the user provides. In practice it should come from a licensed cat model (RMS, AIR) or validated public model (FEMA, USACE). I'd welcome input on which models work best for which interventions and assets.</p>
   </div>
 
   <div class="faq-item">
@@ -67,7 +67,7 @@
 
   <div class="faq-item">
     <h3>3. Is this asset level, community level, or translating between the two?</h3>
-    <p>The tool is agnostic and has no translation mechanism. Partial protection (e.g. a levee covering 60% of exposed assets) can't be represented. I can add spatial disaggregation logic and a protection footprint layer so outputs correctly reflect which assets are inside vs. outside the protection zone.</p>
+    <p>The tool is agnostic and has no translation mechanism. Partial protection (e.g. a levee covering 60% of exposed assets) can't be represented. In future versions, spatial disaggregation logic and a protection footprint layer will help outputs correctly reflect which assets are inside vs. outside the protection zone.</p>
   </div>
 
   <div class="faq-item">
@@ -77,7 +77,7 @@
 
   <div class="faq-item">
     <h3>5. Can you back-test against actual claims data?</h3>
-    <p>No. Outputs are internally consistent but empirically ungrounded. I'm thinking to benchmark mitigated EAL reductions against FEMA BCA toolkit results or USACE study outcomes for comparable intervention types.</p>
+    <p>No. Dummy data mean that right now outputs are internally consistent but empirically ungrounded. I'm thinking to benchmark mitigated EAL reductions against FEMA BCA toolkit results or USACE study outcomes for comparable intervention types.</p>
   </div>
 
   <div class="faq-item">
@@ -92,7 +92,7 @@
 
   <div class="faq-item">
     <h3>8. Cost constraints — can it scale cheaply?</h3>
-    <p>The engine itself would be essentially free, or very low cost for municipal users. The cost problem is upstream inputs. I'm thinking to wire FEMA flood frequency data and HAZUS damage functions as a free, defensible default input source — making the full pipeline viable for small municipalities or parametric products where a full cat model run isn't justified.</p>
+    <p>The engine itself would be essentially free, or very low cost for municipal users. The cost problem is upstream inputs. I'm thinking to wire FEMA flood frequency data and HAZUS damage functions as a free, defensible default input source. This would make the full pipeline viable for small municipalities or parametric products where a full cat model run isn't justified.</p>
   </div>
 
 </div>
