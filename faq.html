@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Technical FAQ — Loss Distribution Translator</title>
+<style>
+  :root {
+    --bg: #f4f6f9;
+    --panel: #ffffff;
+    --border: #dde1e8;
+    --accent: #1a56db;
+    --text: #1a1f36;
+    --muted: #6b7280;
+    --radius: 8px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: var(--bg); color: var(--text); font-size: 14px; }
+
+  header { background: var(--accent); color: #fff; padding: 14px 24px;
+           display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header a { color: #fff; opacity: 0.8; font-size: 12px; text-decoration: none;
+             margin-left: auto; border: 1px solid rgba(255,255,255,0.4);
+             border-radius: 4px; padding: 4px 10px; }
+  header a:hover { opacity: 1; }
+
+  .container { max-width: 780px; margin: 40px auto; padding: 0 24px 60px; }
+
+  h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 36px; }
+
+  .faq-item { background: var(--panel); border: 1px solid var(--border);
+              border-radius: var(--radius); padding: 22px 24px;
+              box-shadow: var(--shadow); margin-bottom: 16px; }
+  .faq-item h3 { font-size: 14px; font-weight: 600; color: var(--accent);
+                 margin-bottom: 10px; line-height: 1.4; }
+  .faq-item p { font-size: 13px; color: var(--text); line-height: 1.7; }
+  .faq-item p + p { margin-top: 8px; }
+  .faq-item em { color: var(--muted); font-style: normal; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Loss Distribution Translator</h1>
+  </div>
+  <a href="/">← Back to tool</a>
+</header>
+
+<div class="container">
+  <h2>Technical FAQ</h2>
+  <p class="subtitle">Background on methodology, data requirements, and current limitations.</p>
+
+  <div class="faq-item">
+    <h3>1. Where are your input data coming from, and what makes them defensible?</h3>
+    <p>Right now this is a calculation engine only, using dummy data. Defensibility would come from whatever event-loss table the user provides. In practice it should come from a licensed cat model (RMS, AIR) or validated public model (FEMA, USACE). I'd welcome input on which models to ingest for which interventions and assets.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>2. How are you defining and parameterizing flood mitigation?</h3>
+    <p>Generic scalar parameters (a depth threshold, two reduction percentages). No hydraulic routing, no intervention-specific fragility. A levee and a detention basin use identical parameter slots. Scalars with intervention-specific performance curves derived from hydraulic model runs, feeding into a depth-damage function, would be an improvement.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>3. Is this asset level, community level, or translating between the two?</h3>
+    <p>The tool is agnostic and has no translation mechanism. Partial protection (e.g. a levee covering 60% of exposed assets) can't be represented. I can add spatial disaggregation logic and a protection footprint layer so outputs correctly reflect which assets are inside vs. outside the protection zone.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>4. What vulnerability functions or damage curves are you using?</h3>
+    <p>None. Gross loss arrives pre-computed; the tool never touches hazard-to-loss conversion. The next version can integrate depth-damage functions (e.g., HAZUS curves) so the tool can derive loss from hazard directly, rather than depending entirely on upstream assumptions it can't inspect.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>5. Can you back-test against actual claims data?</h3>
+    <p>No. Outputs are internally consistent but empirically ungrounded. I'm thinking to benchmark mitigated EAL reductions against FEMA BCA toolkit results or USACE study outcomes for comparable intervention types.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>6. Is this single project or scalable to portfolios?</h3>
+    <p>Single project only. The data model (one CSV, one mitigation profile) has no aggregation logic, spatial correlation, or multi-intervention support. The data model can be restructured to handle location-level event sets with a protection footprint layer and correlated aggregate losses.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>7. What is the development path to real decision value?</h3>
+    <p>I want to close three gaps: (1) a governed data ingestion path from a validated model, (2) actuarially reviewed mitigation parameters, (3) empirical validation against loss experience. Until then this can be a sensitivity analysis and EP curve communication tool, not a pricing input.</p>
+  </div>
+
+  <div class="faq-item">
+    <h3>8. Cost constraints — can it scale cheaply?</h3>
+    <p>The engine itself would be essentially free, or very low cost for municipal users. The cost problem is upstream inputs. I'm thinking to wire FEMA flood frequency data and HAZUS damage functions as a free, defensible default input source — making the full pipeline viable for small municipalities or parametric products where a full cat model run isn't justified.</p>
+  </div>
+
+</div>
+</body>
+</html>

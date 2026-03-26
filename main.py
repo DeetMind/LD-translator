@@ -287,6 +287,22 @@ async def analyze(request: AnalysisRequest):
     return JSONResponse(content=result)
 
 
+@app.get("/faq", response_class=HTMLResponse)
+async def faq():
+    faq_path = Path(__file__).parent / "faq.html"
+    return faq_path.read_text()
+
+
+@app.get("/api/download-example-csv")
+async def download_example_csv():
+    path = Path(__file__).parent / "sample_data" / "example_events.csv"
+    return StreamingResponse(
+        io.BytesIO(path.read_bytes()),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=example_events.csv"},
+    )
+
+
 @app.get("/api/sample-data")
 async def get_sample_data():
     """Return sample CSV and JSON payloads for quick-start."""
