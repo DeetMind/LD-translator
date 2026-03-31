@@ -1,0 +1,15 @@
+{
+  "intervention_name": "Impact-Resistant Roof Upgrade (Class 4)",
+  "base_loss_reduction_pct": 0.35,
+  "failure_probability": 0.05,
+  "maintenance_haircut_pct": 0.10,
+  "intervention_cost_usd": 12000,
+
+  "_notes": {
+    "purpose": "Illustrative placeholder assumptions for the hail roof-upgrade demo.",
+    "base_loss_reduction_pct": "Rough proxy for IBHS/Fortified-style Class 4 roof. Conservative — does not assume full envelope hardening.",
+    "failure_probability": "Small chance of installation defect or extreme impact exceeding rated performance.",
+    "maintenance_haircut_pct": "Aging shingles and sealant degradation over a typical policy period.",
+    "update_path": "Replace these values with IBHS-informed parameters when available. These are intentionally separated from event-loss CSV assumptions so they can be updated independently."
+  }
+}

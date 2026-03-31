@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loss Distribution Translator v2</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Loss Distribution Translator v2</h1>
+    <div class="subtitle">Hail &middot; Residential Property &middot; Roof Upgrade Demo</div>
+  </div>
+</header>
+
+<div class="page-container">
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Section 1 — Asset & Hazard                                      -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="section-card">
+    <h2>Asset &amp; Hazard</h2>
+    <p class="section-note">Single-family residential property &middot; Hail hazard</p>
+
+    <div class="row-2">
+      <div class="field-group">
+        <label for="asset_name">Property Name</label>
+        <input type="text" id="asset_name" value="Sample Residential Property" />
+      </div>
+      <div class="field-group">
+        <label for="location_name">Location</label>
+        <input type="text" id="location_name" placeholder="e.g., Oklahoma City, OK" />
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field-group">
+        <label for="asset_value_usd">Replacement Value ($)</label>
+        <input type="number" id="asset_value_usd" value="375000" min="0" step="1000" />
+      </div>
+      <div class="field-group">
+        <label for="hazard_share_pct">Hail Share of Total Risk (%)</label>
+        <input type="number" id="hazard_share_pct" placeholder="e.g., 40" min="0" max="100" step="1" />
+        <div class="helper">Optional. If hail represents only a share of total risk, enter the estimated percentage. Leave blank to report hail-specific results only.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Section 2 — Event Loss Upload                                    -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="section-card">
+    <h2>Event Loss Inputs</h2>
+    <p class="section-note">Upload a CSV with columns: event_id, annual_probability, return_period, hazard_intensity (Hail Size in inches), gross_loss_usd</p>
+
+    <div class="file-upload-area" id="upload_area">
+      <div class="upload-icon">&#128196;</div>
+      <div class="upload-text">Click or drag to upload event-loss CSV</div>
+      <div class="file-name" id="file_name" style="display:none;"></div>
+      <input type="file" id="csv_file" accept=".csv" />
+    </div>
+    <button class="sample-btn" id="load_sample_btn">Load sample hail scenario</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Section 3 — Policy Layer                                         -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="section-card">
+    <h2>Policy Layer</h2>
+    <p class="section-note">Residential property / homeowners-style policy assumptions. These are illustrative defaults — adjust to match your scenario.</p>
+
+    <div class="row-2">
+      <div class="field-group">
+        <label for="insured_share_mode">Policy Input Mode</label>
+        <select id="insured_share_mode">
+          <option value="full_policy_inputs" selected>Full policy inputs</option>
+          <option value="simple_insured_share_assumption">Simple insured share %</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label for="coverage_limit_usd">Coverage Limit ($)</label>
+        <input type="number" id="coverage_limit_usd" value="375000" min="0" step="1000" />
+      </div>
+    </div>
+
+    <!-- Full policy inputs -->
+    <div id="full_policy_fields">
+      <div class="row-3">
+        <div class="field-group">
+          <label for="deductible_type">Deductible Type</label>
+          <select id="deductible_type">
+            <option value="flat_usd">Flat dollar amount</option>
+            <option value="percent_of_coverage" selected>% of coverage</option>
+          </select>
+        </div>
+        <div class="field-group" id="deductible_usd_group" style="display:none;">
+          <label for="deductible_usd">Deductible ($)</label>
+          <input type="number" id="deductible_usd" value="2500" min="0" step="100" />
+        </div>
+        <div class="field-group" id="deductible_pct_group">
+          <label for="deductible_pct">Deductible (% of coverage)</label>
+          <input type="number" id="deductible_pct" value="2" min="0" max="100" step="0.5" />
+        </div>
+        <div class="field-group">
+          <label>Derived Deductible</label>
+          <div class="derived-value" id="derived_deductible">$7,500</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple share fields -->
+    <div id="simple_share_fields" style="display:none;">
+      <div class="row-2">
+        <div class="field-group">
+          <label for="insured_share_pct">Insured Share (%)</label>
+          <input type="number" id="insured_share_pct" value="80" min="0" max="100" step="1" />
+          <div class="helper">Percentage of gross loss assumed to be insured.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Optional fields -->
+    <div class="row-2" style="margin-top: 14px;">
+      <div class="field-group">
+        <label for="coinsurance_pct">Coinsurance (%)</label>
+        <input type="number" id="coinsurance_pct" value="100" min="0" max="100" step="1" />
+        <div class="helper">Captured for future use. Does not alter calculations in this build.</div>
+      </div>
+      <div class="field-group">
+        <label for="premium_usd_current">Current Annual Premium ($)</label>
+        <input type="number" id="premium_usd_current" placeholder="Optional — informational only" min="0" step="100" />
+        <div class="helper">Informational only. Not used to estimate premium reduction.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Section 4 — Mitigation / Roof Upgrade                           -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="section-card">
+    <h2>Mitigation — Roof Upgrade</h2>
+    <p class="section-note">Illustrative starting assumptions for a Class 4 impact-resistant roof. User-adjustable. Replace with IBHS-informed values when available.</p>
+
+    <div class="field-group">
+      <label for="intervention_name">Intervention Name</label>
+      <input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" />
+    </div>
+
+    <div class="row-3">
+      <div class="field-group">
+        <label for="base_loss_reduction_pct">Base Loss Reduction (%)</label>
+        <input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" />
+        <div class="helper">Estimated reduction from the roof upgrade alone.</div>
+      </div>
+      <div class="field-group">
+        <label for="failure_probability">Failure Probability (%)</label>
+        <input type="number" id="failure_probability" value="5" min="0" max="100" step="1" />
+        <div class="helper">Chance the upgrade does not perform as expected.</div>
+      </div>
+      <div class="field-group">
+        <label for="maintenance_haircut_pct">Maintenance Haircut (%)</label>
+        <input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" />
+        <div class="helper">Degradation over time from aging and wear.</div>
+      </div>
+    </div>
+
+    <div class="derived-value" id="effective_reduction_display">
+      <div class="label">Effective Reduction</div>
+      <div class="value" id="effective_reduction_value">29.9%</div>
+    </div>
+
+    <div class="field-group" style="margin-top: 14px;">
+      <label for="intervention_cost_usd">Intervention Cost ($)</label>
+      <input type="number" id="intervention_cost_usd" value="12000" min="0" step="500" />
+      <div class="helper">Optional. Not used in loss calculations.</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Run Analysis                                                     -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="run-section">
+    <button class="run-btn" id="run_btn">Run Analysis</button>
+    <div class="cap-toggle">
+      <input type="checkbox" id="apply_asset_cap" checked />
+      <label for="apply_asset_cap">Cap event losses at asset replacement value</label>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Warnings                                                         -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div id="warnings_area"></div>
+  <div id="errors_area"></div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Results                                                          -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="results-area" id="results_area">
+    <div class="results-divider">Results</div>
+
+    <!-- Card 1 — Broker / Underwriter Summary -->
+    <div class="result-card primary" id="card_broker">
+      <h3>Broker / Underwriter Summary</h3>
+      <p class="summary-text" id="broker_summary_text"></p>
+    </div>
+
+    <!-- Card 2 — Insurance Effect -->
+    <div class="result-card" id="card_insurance">
+      <h3>Insurance Effect</h3>
+      <div class="kpi-row" id="insurance_kpis"></div>
+    </div>
+
+    <!-- Card 3 — Physical Effect -->
+    <div class="result-card" id="card_physical">
+      <h3>Physical Effect (Gross Loss)</h3>
+      <div class="kpi-row" id="physical_kpis"></div>
+    </div>
+
+    <!-- Card 4 — Uninsured / Retained -->
+    <div class="result-card" id="card_uninsured">
+      <h3>Uninsured / Retained</h3>
+      <div class="kpi-row" id="uninsured_kpis"></div>
+    </div>
+
+    <!-- Card 5 — Policy Relevance -->
+    <div class="result-card" id="card_policy_relevance">
+      <h3>Policy Relevance</h3>
+      <p class="relevance-text" id="policy_relevance_text"></p>
+    </div>
+
+    <!-- Card 6 — EP Curves -->
+    <div class="chart-row">
+      <div class="chart-container">
+        <h3>Gross Loss EP Curve</h3>
+        <div id="chart_gross_ep" style="height:320px;"></div>
+      </div>
+      <div class="chart-container">
+        <h3>Insured Loss EP Curve</h3>
+        <div id="chart_insured_ep" style="height:320px;"></div>
+      </div>
+    </div>
+
+    <!-- Card 7 — Event Table (collapsed) -->
+    <div class="event-table-section">
+      <button class="toggle-btn" id="toggle_event_table">&#9654; Show event-level detail</button>
+      <div class="event-table-wrap" id="event_table_wrap">
+        <table class="event-table" id="event_table">
+          <thead id="event_table_head"></thead>
+          <tbody id="event_table_body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Capped notice -->
+    <div class="alert alert-warning" id="cap_notice" style="display:none; margin-top: 16px;">
+      One or more event losses were capped at the stated asset replacement value.
+    </div>
+  </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
