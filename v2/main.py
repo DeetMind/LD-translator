@@ -7,7 +7,7 @@ Hail · Residential Property · Roof Upgrade Demo
 """
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -168,6 +168,17 @@ async def get_sample_data():
         "mitigation": json.loads((base / "sample_mitigation.json").read_text()),
         "policy": json.loads((base / "sample_policy.json").read_text()),
     }
+
+
+@app.get("/api/v2/download-sample-csv")
+async def download_sample_csv():
+    """Download the sample hail scenario CSV for format reference."""
+    path = Path(__file__).parent / "sample_data" / "sample_hail_scenario.csv"
+    return StreamingResponse(
+        io.BytesIO(path.read_bytes()),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=sample_hail_scenario.csv"},
+    )
 
 
 if __name__ == "__main__":

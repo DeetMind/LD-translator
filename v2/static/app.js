@@ -169,6 +169,18 @@ $("load_sample_btn").addEventListener("click", async () => {
   }
 });
 
+// ── FAQ toggle ──────────────────────────────────────────────────────────
+$("faq_toggle").addEventListener("click", function () {
+  const wrap = $("faq_wrap");
+  const visible = wrap.classList.toggle("visible");
+  this.innerHTML = (visible ? "&#9660;" : "&#9654;") + " Technical FAQ";
+});
+
+// ── Download sample CSV ─────────────────────────────────────────────────
+$("download_sample_btn").addEventListener("click", () => {
+  window.location.href = API_BASE + "/api/v2/download-sample-csv";
+});
+
 // ── Event table toggle ──────────────────────────────────────────────────
 $("toggle_event_table").addEventListener("click", function () {
   const wrap = $("event_table_wrap");

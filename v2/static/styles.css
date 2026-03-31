@@ -39,6 +39,101 @@ header {
 header h1 { font-size: 18px; font-weight: 600; margin-bottom: 2px; }
 header .subtitle { font-size: 12px; opacity: 0.75; font-weight: 400; }
 
+/* ─── Intro card ─────────────────────────────────────────────────────── */
+
+.intro-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+.intro-card .intro-lead {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.intro-card p {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.intro-list {
+  margin: 8px 0 12px 20px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+}
+.intro-list li { margin-bottom: 3px; }
+.intro-card .intro-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+  margin-bottom: 0;
+  font-style: italic;
+}
+
+/* ─── FAQ section ────────────────────────────────────────────────────── */
+
+.faq-section {
+  margin-bottom: 20px;
+}
+.faq-toggle-btn {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  box-shadow: var(--shadow);
+  transition: background 0.15s;
+}
+.faq-toggle-btn:hover { background: var(--accent-light); }
+
+.faq-wrap {
+  display: none;
+  margin-top: 12px;
+}
+.faq-wrap.visible { display: block; }
+
+.faq-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 10px;
+}
+.faq-item h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+.faq-item p {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 6px;
+}
+.faq-item p:last-child { margin-bottom: 0; }
+.faq-item ul {
+  margin: 6px 0 8px 18px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.65;
+}
+.faq-item ul li { margin-bottom: 2px; }
+
 /* ─── Main layout ────────────────────────────────────────────────────── */
 
 .page-container {
@@ -169,6 +264,21 @@ header .subtitle { font-size: 12px; opacity: 0.75; font-weight: 400; }
   transition: background 0.15s;
 }
 .sample-btn:hover { background: var(--accent-light); }
+.sample-btn-secondary {
+  color: var(--muted);
+  border-color: var(--border);
+}
+.sample-btn-secondary:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.upload-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
 
 /* ─── Run button ─────────────────────────────────────────────────────── */
 

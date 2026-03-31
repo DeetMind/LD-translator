@@ -19,6 +19,114 @@
 <div class="page-container">
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- Intro                                                            -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="intro-card">
+    <p class="intro-lead">This tool translates physical risk reduction (e.g., a roof upgrade) into insurance-relevant outcomes under a specified policy structure.</p>
+    <p>It takes an event-based loss distribution (e.g., hail scenarios), applies mitigation assumptions, and maps resulting losses through a policy layer to show:</p>
+    <ul class="intro-list">
+      <li>Changes in expected annual loss (EAL)</li>
+      <li>Changes in insured vs. uninsured loss</li>
+      <li>Where avoided losses sit relative to the deductible and coverage</li>
+      <li>How mitigation impacts decision-relevant insurance metrics</li>
+    </ul>
+    <p class="intro-note">This demo focuses on a single residential property exposed to hail risk. All assumptions (hazard, loss, policy, and mitigation) are user-editable and intended as illustrative starting points only.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <!-- FAQ                                                              -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <div class="faq-section">
+    <button class="faq-toggle-btn" id="faq_toggle">&#9654; Technical FAQ</button>
+    <div class="faq-wrap" id="faq_wrap">
+
+      <div class="faq-item">
+        <h3>1. Where do the input data come from, and what makes them defensible?</h3>
+        <p>The tool itself does not generate loss data. It operates on an event-level loss distribution provided by the user.</p>
+        <p>Defensibility depends entirely on the source of that distribution. In practice, this could come from:</p>
+        <ul>
+          <li>Catastrophe models (e.g., RMS, AIR)</li>
+          <li>Engineering-based studies</li>
+          <li>Insurer or reinsurer loss data</li>
+          <li>Validated public datasets</li>
+        </ul>
+        <p>The current sample data are illustrative and intended only to demonstrate structure.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>2. What does the tool actually do?</h3>
+        <p>The tool translates mitigation into decision-relevant insurance outcomes. It:</p>
+        <ul>
+          <li>Applies mitigation assumptions to an event-level loss distribution</li>
+          <li>Recomputes expected annual loss (EAL) and exceedance probability (EP) curves</li>
+          <li>Maps losses through a policy structure (deductible, limit)</li>
+          <li>Reports changes in gross, insured, and uninsured loss</li>
+        </ul>
+        <p>It does not model hazard or damage directly.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>3. How is mitigation represented?</h3>
+        <p>Mitigation is modeled using three parameters:</p>
+        <ul>
+          <li>Base loss reduction</li>
+          <li>Probability of failure</li>
+          <li>Maintenance degradation</li>
+        </ul>
+        <p>These combine into an effective reduction applied to event losses.</p>
+        <p>This is a simplified representation. It does not model component-level damage, installation variability, or hazard-specific performance curves. These parameters are intended to be replaced with better empirical or engineering-based estimates where available.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>4. Does the tool include vulnerability or damage functions?</h3>
+        <p>No. Losses are provided directly in the input CSV. The tool does not convert hazard intensity (e.g., hail size) into damage.</p>
+        <p>This keeps the tool modular, but means all hazard-to-loss assumptions sit upstream, and the tool cannot validate those assumptions internally.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>5. How does the insurance layer work?</h3>
+        <p>The tool applies a simplified policy structure: deductible (flat or % of coverage), coverage limit, and an optional insured share mode.</p>
+        <p>It then calculates insured loss and uninsured (retained) loss. This allows comparison between physical loss reduction and insurance-relevant outcomes.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>6. Why might mitigation reduce gross loss but not insured loss?</h3>
+        <p>Because of policy structure. If avoided losses occur below the deductible or above the coverage limit, then insured loss may change less than gross loss.</p>
+        <p>This is a central use case of the tool: identifying where mitigation sits relative to the policy layer.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>7. Is this asset-level or portfolio-level?</h3>
+        <p>This version is asset-level only. It operates on one asset, one event-loss distribution, and one mitigation profile. It does not currently support portfolios, spatial correlation, or multiple assets or interventions.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>8. Can this be validated against real-world outcomes?</h3>
+        <p>Not within the tool itself. Validation would require comparing input loss distributions to observed claims and benchmarking mitigation effects against empirical studies.</p>
+        <p>At present, outputs are mechanically consistent but depend entirely on input assumptions.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>9. What is hazard share?</h3>
+        <p>Hazard share represents the portion of total risk attributable to the modeled hazard (hail in this demo). If provided, the tool translates hazard-specific loss reduction into an estimate of total-risk reduction. If not provided, results are hazard-specific only.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>10. What are the main limitations of this version?</h3>
+        <ul>
+          <li>No hazard or damage modeling (losses are exogenous)</li>
+          <li>Simplified mitigation representation</li>
+          <li>Simplified policy structure</li>
+          <li>Single-asset scope</li>
+          <li>No empirical calibration built in</li>
+        </ul>
+        <p>This version is best understood as a translation and sensitivity tool, not a predictive model.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <!-- Section 1 — Asset & Hazard                                      -->
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <div class="section-card">
@@ -62,7 +170,10 @@
       <div class="file-name" id="file_name" style="display:none;"></div>
       <input type="file" id="csv_file" accept=".csv" />
     </div>
-    <button class="sample-btn" id="load_sample_btn">Load sample hail scenario</button>
+    <div class="upload-actions">
+      <button class="sample-btn" id="load_sample_btn">Load sample hail scenario</button>
+      <button class="sample-btn sample-btn-secondary" id="download_sample_btn">Download sample CSV</button>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
