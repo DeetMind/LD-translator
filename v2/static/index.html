@@ -10,369 +10,190 @@
 <body>
 
 <header>
-  <div>
-    <h1>Loss Distribution Translator v2</h1>
-    <div class="subtitle">Hail &middot; Residential Property &middot; Roof Upgrade Demo</div>
-  </div>
+  <h1>Loss Distribution Translator v2</h1>
+  <span class="subtitle">Hail &middot; Residential Property &middot; Roof Upgrade Demo</span>
 </header>
 
-<div class="page-container">
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Intro                                                            -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="intro-card">
-    <p class="intro-lead">This tool translates physical risk reduction (e.g., a roof upgrade) into insurance-relevant outcomes under a specified policy structure.</p>
-    <p>It takes an event-based loss distribution (e.g., hail scenarios), applies mitigation assumptions, and maps resulting losses through a policy layer to show:</p>
-    <ul class="intro-list">
-      <li>Changes in expected annual loss (EAL)</li>
-      <li>Changes in insured vs. uninsured loss</li>
-      <li>Where avoided losses sit relative to the deductible and coverage</li>
-      <li>How mitigation impacts decision-relevant insurance metrics</li>
-    </ul>
-    <p class="intro-note">This demo focuses on a single residential property exposed to hail risk. All assumptions (hazard, loss, policy, and mitigation) are user-editable and intended as illustrative starting points only.</p>
+<!-- ── Intro + FAQ (full width, above the two-pane layout) ────────── -->
+<div class="top-bar">
+  <div class="intro">
+    <p>This tool translates physical risk reduction (e.g., a roof upgrade) into insurance-relevant outcomes under a specified policy structure. It takes an event-based loss distribution, applies mitigation assumptions, and maps resulting losses through a policy layer to show changes in EAL, insured vs. uninsured loss, where avoided losses sit relative to the deductible and coverage, and how mitigation impacts decision-relevant insurance metrics.</p>
+    <p class="intro-note">This demo focuses on a single residential property exposed to hail risk. All assumptions are user-editable and illustrative only.</p>
   </div>
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- FAQ                                                              -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="faq-section">
-    <button class="faq-toggle-btn" id="faq_toggle">&#9654; Technical FAQ</button>
-    <div class="faq-wrap" id="faq_wrap">
-
-      <div class="faq-item">
-        <h3>1. Where do the input data come from, and what makes them defensible?</h3>
-        <p>The tool itself does not generate loss data. It operates on an event-level loss distribution provided by the user.</p>
-        <p>Defensibility depends entirely on the source of that distribution. In practice, this could come from:</p>
-        <ul>
-          <li>Catastrophe models (e.g., RMS, AIR)</li>
-          <li>Engineering-based studies</li>
-          <li>Insurer or reinsurer loss data</li>
-          <li>Validated public datasets</li>
-        </ul>
-        <p>The current sample data are illustrative and intended only to demonstrate structure.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>2. What does the tool actually do?</h3>
-        <p>The tool translates mitigation into decision-relevant insurance outcomes. It:</p>
-        <ul>
-          <li>Applies mitigation assumptions to an event-level loss distribution</li>
-          <li>Recomputes expected annual loss (EAL) and exceedance probability (EP) curves</li>
-          <li>Maps losses through a policy structure (deductible, limit)</li>
-          <li>Reports changes in gross, insured, and uninsured loss</li>
-        </ul>
-        <p>It does not model hazard or damage directly.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>3. How is mitigation represented?</h3>
-        <p>Mitigation is modeled using three parameters:</p>
-        <ul>
-          <li>Base loss reduction</li>
-          <li>Probability of failure</li>
-          <li>Maintenance degradation</li>
-        </ul>
-        <p>These combine into an effective reduction applied to event losses.</p>
-        <p>This is a simplified representation. It does not model component-level damage, installation variability, or hazard-specific performance curves. These parameters are intended to be replaced with better empirical or engineering-based estimates where available.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>4. Does the tool include vulnerability or damage functions?</h3>
-        <p>No. Losses are provided directly in the input CSV. The tool does not convert hazard intensity (e.g., hail size) into damage.</p>
-        <p>This keeps the tool modular, but means all hazard-to-loss assumptions sit upstream, and the tool cannot validate those assumptions internally.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>5. How does the insurance layer work?</h3>
-        <p>The tool applies a simplified policy structure: deductible (flat or % of coverage), coverage limit, and an optional insured share mode.</p>
-        <p>It then calculates insured loss and uninsured (retained) loss. This allows comparison between physical loss reduction and insurance-relevant outcomes.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>6. Why might mitigation reduce gross loss but not insured loss?</h3>
-        <p>Because of policy structure. If avoided losses occur below the deductible or above the coverage limit, then insured loss may change less than gross loss.</p>
-        <p>This is a central use case of the tool: identifying where mitigation sits relative to the policy layer.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>7. Is this asset-level or portfolio-level?</h3>
-        <p>This version is asset-level only. It operates on one asset, one event-loss distribution, and one mitigation profile. It does not currently support portfolios, spatial correlation, or multiple assets or interventions.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>8. Can this be validated against real-world outcomes?</h3>
-        <p>Not within the tool itself. Validation would require comparing input loss distributions to observed claims and benchmarking mitigation effects against empirical studies.</p>
-        <p>At present, outputs are mechanically consistent but depend entirely on input assumptions.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>9. What is hazard share?</h3>
-        <p>Hazard share represents the portion of total risk attributable to the modeled hazard (hail in this demo). If provided, the tool translates hazard-specific loss reduction into an estimate of total-risk reduction. If not provided, results are hazard-specific only.</p>
-      </div>
-
-      <div class="faq-item">
-        <h3>10. What are the main limitations of this version?</h3>
-        <ul>
-          <li>No hazard or damage modeling (losses are exogenous)</li>
-          <li>Simplified mitigation representation</li>
-          <li>Simplified policy structure</li>
-          <li>Single-asset scope</li>
-          <li>No empirical calibration built in</li>
-        </ul>
-        <p>This version is best understood as a translation and sensitivity tool, not a predictive model.</p>
-      </div>
-
-    </div>
+  <button class="faq-toggle-btn" id="faq_toggle">&#9654; Technical FAQ</button>
+  <div class="faq-wrap" id="faq_wrap">
+    <div class="faq-item"><h4>1. Where do the input data come from?</h4><p>The tool operates on an event-level loss distribution provided by the user. Defensibility depends on the source: catastrophe models, engineering studies, insurer loss data, or validated public datasets. Sample data are illustrative only.</p></div>
+    <div class="faq-item"><h4>2. What does the tool actually do?</h4><p>It applies mitigation assumptions to event losses, recomputes EAL and EP curves, maps losses through a policy structure (deductible, limit), and reports changes in gross, insured, and uninsured loss. It does not model hazard or damage directly.</p></div>
+    <div class="faq-item"><h4>3. How is mitigation represented?</h4><p>Three parameters: base loss reduction, probability of failure, and maintenance degradation. These combine into an effective reduction applied uniformly. This simplified model does not capture component-level damage or hazard-specific performance curves.</p></div>
+    <div class="faq-item"><h4>4. Does the tool include vulnerability or damage functions?</h4><p>No. Losses are provided directly in the CSV. The tool does not convert hazard intensity into damage. All hazard-to-loss assumptions sit upstream.</p></div>
+    <div class="faq-item"><h4>5. How does the insurance layer work?</h4><p>Simplified policy structure: deductible (flat or % of coverage), coverage limit, optional insured share mode. Calculates insured loss and uninsured (retained) loss.</p></div>
+    <div class="faq-item"><h4>6. Why might mitigation reduce gross loss but not insured loss?</h4><p>If avoided losses occur below the deductible or above the coverage limit, insured loss may change less than gross loss. Identifying where mitigation sits relative to the policy layer is a central use case.</p></div>
+    <div class="faq-item"><h4>7. Is this asset-level or portfolio-level?</h4><p>Asset-level only. One asset, one loss distribution, one mitigation profile. No portfolio, spatial correlation, or multi-asset support.</p></div>
+    <div class="faq-item"><h4>8. Can this be validated against real-world outcomes?</h4><p>Not within the tool. Validation requires comparing input distributions to observed claims and benchmarking mitigation effects. Outputs are mechanically consistent but depend entirely on input assumptions.</p></div>
+    <div class="faq-item"><h4>9. What is hazard share?</h4><p>The portion of total risk attributable to the modeled hazard. If provided, hazard-specific reduction is translated into a total-risk estimate. Otherwise results are hazard-specific only.</p></div>
+    <div class="faq-item"><h4>10. What are the main limitations?</h4><p>No hazard/damage modeling, simplified mitigation and policy, single-asset scope, no empirical calibration. Best understood as a translation and sensitivity tool, not a predictive model.</p></div>
   </div>
+</div>
 
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Section 1 — Asset & Hazard                                      -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="section-card">
-    <h2>Asset &amp; Hazard</h2>
-    <p class="section-note">Single-family residential property &middot; Hail hazard</p>
+<!-- ── Two-pane layout ────────────────────────────────────────────── -->
+<div class="layout">
 
-    <div class="row-2">
-      <div class="field-group">
-        <label for="asset_name">Property Name</label>
-        <input type="text" id="asset_name" value="Sample Residential Property" />
+  <!-- ════ LEFT PANE — Inputs ════════════════════════════════════════ -->
+  <div class="pane-left">
+
+    <!-- Asset & Hazard -->
+    <section class="sec">
+      <h2>Asset &amp; Hazard</h2>
+      <div class="row-2">
+        <div class="fg"><label for="asset_name">Property Name</label><input type="text" id="asset_name" value="Sample Residential Property" /></div>
+        <div class="fg"><label for="location_name">Location</label><input type="text" id="location_name" placeholder="e.g., Oklahoma City, OK" /></div>
       </div>
-      <div class="field-group">
-        <label for="location_name">Location</label>
-        <input type="text" id="location_name" placeholder="e.g., Oklahoma City, OK" />
+      <div class="row-2">
+        <div class="fg"><label for="asset_value_usd">Replacement Value ($)</label><input type="number" id="asset_value_usd" value="375000" min="0" step="1000" /></div>
+        <div class="fg"><label for="hazard_share_pct">Hail Share of Total Risk (%)</label><input type="number" id="hazard_share_pct" placeholder="e.g., 40" min="0" max="100" step="1" /><span class="helper">Optional. Leave blank for hail-specific results only.</span></div>
       </div>
-    </div>
+    </section>
 
-    <div class="row-2">
-      <div class="field-group">
-        <label for="asset_value_usd">Replacement Value ($)</label>
-        <input type="number" id="asset_value_usd" value="375000" min="0" step="1000" />
+    <!-- Event Loss Upload -->
+    <section class="sec">
+      <h2>Event Loss Inputs</h2>
+      <p class="sec-note">CSV: event_id, annual_probability, return_period, hazard_intensity, gross_loss_usd</p>
+      <div class="file-upload-area" id="upload_area">
+        <div class="upload-icon">&#128196;</div>
+        <div class="upload-text">Click or drag CSV</div>
+        <div class="file-name" id="file_name" style="display:none;"></div>
+        <input type="file" id="csv_file" accept=".csv" />
       </div>
-      <div class="field-group">
-        <label for="hazard_share_pct">Hail Share of Total Risk (%)</label>
-        <input type="number" id="hazard_share_pct" placeholder="e.g., 40" min="0" max="100" step="1" />
-        <div class="helper">Optional. If hail represents only a share of total risk, enter the estimated percentage. Leave blank to report hail-specific results only.</div>
+      <div class="upload-actions">
+        <button class="btn-sm" id="load_sample_btn">Load sample</button>
+        <button class="btn-sm btn-ghost" id="download_sample_btn">Download CSV</button>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Section 2 — Event Loss Upload                                    -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="section-card">
-    <h2>Event Loss Inputs</h2>
-    <p class="section-note">Upload a CSV with columns: event_id, annual_probability, return_period, hazard_intensity (Hail Size in inches), gross_loss_usd</p>
-
-    <div class="file-upload-area" id="upload_area">
-      <div class="upload-icon">&#128196;</div>
-      <div class="upload-text">Click or drag to upload event-loss CSV</div>
-      <div class="file-name" id="file_name" style="display:none;"></div>
-      <input type="file" id="csv_file" accept=".csv" />
-    </div>
-    <div class="upload-actions">
-      <button class="sample-btn" id="load_sample_btn">Load sample hail scenario</button>
-      <button class="sample-btn sample-btn-secondary" id="download_sample_btn">Download sample CSV</button>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Section 3 — Policy Layer                                         -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="section-card">
-    <h2>Policy Layer</h2>
-    <p class="section-note">Residential property / homeowners-style policy assumptions. These are illustrative defaults — adjust to match your scenario.</p>
-
-    <div class="row-2">
-      <div class="field-group">
-        <label for="insured_share_mode">Policy Input Mode</label>
-        <select id="insured_share_mode">
-          <option value="full_policy_inputs" selected>Full policy inputs</option>
-          <option value="simple_insured_share_assumption">Simple insured share %</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label for="coverage_limit_usd">Coverage Limit ($)</label>
-        <input type="number" id="coverage_limit_usd" value="375000" min="0" step="1000" />
-      </div>
-    </div>
-
-    <!-- Full policy inputs -->
-    <div id="full_policy_fields">
-      <div class="row-3">
-        <div class="field-group">
-          <label for="deductible_type">Deductible Type</label>
-          <select id="deductible_type">
-            <option value="flat_usd">Flat dollar amount</option>
-            <option value="percent_of_coverage" selected>% of coverage</option>
+    <!-- Policy Layer -->
+    <section class="sec">
+      <h2>Policy Layer</h2>
+      <div class="row-2">
+        <div class="fg"><label for="insured_share_mode">Policy Mode</label>
+          <select id="insured_share_mode">
+            <option value="full_policy_inputs" selected>Full policy inputs</option>
+            <option value="simple_insured_share_assumption">Simple insured share %</option>
           </select>
         </div>
-        <div class="field-group" id="deductible_usd_group" style="display:none;">
-          <label for="deductible_usd">Deductible ($)</label>
-          <input type="number" id="deductible_usd" value="2500" min="0" step="100" />
-        </div>
-        <div class="field-group" id="deductible_pct_group">
-          <label for="deductible_pct">Deductible (% of coverage)</label>
-          <input type="number" id="deductible_pct" value="2" min="0" max="100" step="0.5" />
-        </div>
-        <div class="field-group">
-          <label>Derived Deductible</label>
-          <div class="derived-value" id="derived_deductible">$7,500</div>
+        <div class="fg"><label for="coverage_limit_usd">Coverage Limit ($)</label><input type="number" id="coverage_limit_usd" value="375000" min="0" step="1000" /></div>
+      </div>
+      <div id="full_policy_fields">
+        <div class="row-3">
+          <div class="fg"><label for="deductible_type">Deductible Type</label>
+            <select id="deductible_type">
+              <option value="flat_usd">Flat $</option>
+              <option value="percent_of_coverage" selected>% of coverage</option>
+            </select>
+          </div>
+          <div class="fg" id="deductible_usd_group" style="display:none;"><label for="deductible_usd">Deductible ($)</label><input type="number" id="deductible_usd" value="2500" min="0" step="100" /></div>
+          <div class="fg" id="deductible_pct_group"><label for="deductible_pct">Deductible (%)</label><input type="number" id="deductible_pct" value="2" min="0" max="100" step="0.5" /></div>
+          <div class="fg"><label>Derived Ded.</label><div class="derived-val" id="derived_deductible">$7,500</div></div>
         </div>
       </div>
-    </div>
-
-    <!-- Simple share fields -->
-    <div id="simple_share_fields" style="display:none;">
+      <div id="simple_share_fields" style="display:none;">
+        <div class="fg"><label for="insured_share_pct">Insured Share (%)</label><input type="number" id="insured_share_pct" value="80" min="0" max="100" step="1" /></div>
+      </div>
       <div class="row-2">
-        <div class="field-group">
-          <label for="insured_share_pct">Insured Share (%)</label>
-          <input type="number" id="insured_share_pct" value="80" min="0" max="100" step="1" />
-          <div class="helper">Percentage of gross loss assumed to be insured.</div>
+        <div class="fg"><label for="coinsurance_pct">Coinsurance (%)</label><input type="number" id="coinsurance_pct" value="100" min="0" max="100" step="1" /><span class="helper">Future use. Does not alter calculations.</span></div>
+        <div class="fg"><label for="premium_usd_current">Premium ($/yr)</label><input type="number" id="premium_usd_current" placeholder="Optional" min="0" step="100" /><span class="helper">Informational only.</span></div>
+      </div>
+    </section>
+
+    <!-- Mitigation -->
+    <section class="sec">
+      <h2>Mitigation &mdash; Roof Upgrade</h2>
+      <div class="fg"><label for="intervention_name">Intervention</label><input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" /></div>
+      <div class="row-3">
+        <div class="fg"><label for="base_loss_reduction_pct">Base Reduction (%)</label><input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" /></div>
+        <div class="fg"><label for="failure_probability">Failure Prob. (%)</label><input type="number" id="failure_probability" value="5" min="0" max="100" step="1" /></div>
+        <div class="fg"><label for="maintenance_haircut_pct">Maint. Haircut (%)</label><input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" /></div>
+      </div>
+      <div class="derived-val eff-val" id="effective_reduction_display">Effective Reduction: <strong id="effective_reduction_value">29.9%</strong></div>
+      <div class="fg"><label for="intervention_cost_usd">Cost ($)</label><input type="number" id="intervention_cost_usd" value="12000" min="0" step="500" /><span class="helper">Not used in loss calculations.</span></div>
+    </section>
+
+    <!-- Run -->
+    <section class="sec run-sec">
+      <button class="run-btn" id="run_btn">Run Analysis</button>
+      <label class="cap-toggle"><input type="checkbox" id="apply_asset_cap" checked /> Cap losses at replacement value</label>
+    </section>
+
+  </div><!-- /pane-left -->
+
+  <!-- ════ RIGHT PANE — Results ══════════════════════════════════════ -->
+  <div class="pane-right">
+
+    <div id="warnings_area"></div>
+    <div id="errors_area"></div>
+
+    <div class="results-area" id="results_area">
+
+      <!-- Broker summary -->
+      <div class="res-card res-primary" id="card_broker">
+        <h3>Broker / Underwriter Summary</h3>
+        <p class="summary-text" id="broker_summary_text"></p>
+      </div>
+
+      <!-- Insurance Effect -->
+      <div class="res-card" id="card_insurance">
+        <h3>Insurance Effect</h3>
+        <div class="kpi-row" id="insurance_kpis"></div>
+      </div>
+
+      <!-- Physical Effect -->
+      <div class="res-card" id="card_physical">
+        <h3>Physical Effect (Gross Loss)</h3>
+        <div class="kpi-row" id="physical_kpis"></div>
+      </div>
+
+      <!-- Uninsured / Retained -->
+      <div class="res-card" id="card_uninsured">
+        <h3>Uninsured / Retained</h3>
+        <div class="kpi-row" id="uninsured_kpis"></div>
+      </div>
+
+      <!-- Policy Relevance -->
+      <div class="res-card" id="card_policy_relevance">
+        <h3>Policy Relevance</h3>
+        <p class="relevance-text" id="policy_relevance_text"></p>
+      </div>
+
+      <!-- EP Curves -->
+      <div class="ep-row">
+        <div class="ep-chart"><h3>Gross Loss EP Curve</h3><div id="chart_gross_ep" style="height:260px;"></div></div>
+        <div class="ep-chart"><h3>Insured Loss EP Curve</h3><div id="chart_insured_ep" style="height:260px;"></div></div>
+      </div>
+
+      <!-- Event Table -->
+      <div class="evt-section">
+        <button class="toggle-btn" id="toggle_event_table">&#9654; Show event-level detail</button>
+        <div class="event-table-wrap" id="event_table_wrap">
+          <table class="event-table" id="event_table">
+            <thead id="event_table_head"></thead>
+            <tbody id="event_table_body"></tbody>
+          </table>
         </div>
       </div>
-    </div>
 
-    <!-- Optional fields -->
-    <div class="row-2" style="margin-top: 14px;">
-      <div class="field-group">
-        <label for="coinsurance_pct">Coinsurance (%)</label>
-        <input type="number" id="coinsurance_pct" value="100" min="0" max="100" step="1" />
-        <div class="helper">Captured for future use. Does not alter calculations in this build.</div>
+      <div class="alert alert-warning" id="cap_notice" style="display:none;">
+        One or more event losses were capped at the stated asset replacement value.
       </div>
-      <div class="field-group">
-        <label for="premium_usd_current">Current Annual Premium ($)</label>
-        <input type="number" id="premium_usd_current" placeholder="Optional — informational only" min="0" step="100" />
-        <div class="helper">Informational only. Not used to estimate premium reduction.</div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Section 4 — Mitigation / Roof Upgrade                           -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="section-card">
-    <h2>Mitigation — Roof Upgrade</h2>
-    <p class="section-note">Illustrative starting assumptions for a Class 4 impact-resistant roof. User-adjustable. Replace with IBHS-informed values when available.</p>
+    </div><!-- /results-area -->
 
-    <div class="field-group">
-      <label for="intervention_name">Intervention Name</label>
-      <input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" />
+    <!-- Placeholder before first run -->
+    <div class="placeholder" id="results_placeholder">
+      <p>Results will appear here after running the analysis.</p>
     </div>
 
-    <div class="row-3">
-      <div class="field-group">
-        <label for="base_loss_reduction_pct">Base Loss Reduction (%)</label>
-        <input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" />
-        <div class="helper">Estimated reduction from the roof upgrade alone.</div>
-      </div>
-      <div class="field-group">
-        <label for="failure_probability">Failure Probability (%)</label>
-        <input type="number" id="failure_probability" value="5" min="0" max="100" step="1" />
-        <div class="helper">Chance the upgrade does not perform as expected.</div>
-      </div>
-      <div class="field-group">
-        <label for="maintenance_haircut_pct">Maintenance Haircut (%)</label>
-        <input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" />
-        <div class="helper">Degradation over time from aging and wear.</div>
-      </div>
-    </div>
+  </div><!-- /pane-right -->
 
-    <div class="derived-value" id="effective_reduction_display">
-      <div class="label">Effective Reduction</div>
-      <div class="value" id="effective_reduction_value">29.9%</div>
-    </div>
-
-    <div class="field-group" style="margin-top: 14px;">
-      <label for="intervention_cost_usd">Intervention Cost ($)</label>
-      <input type="number" id="intervention_cost_usd" value="12000" min="0" step="500" />
-      <div class="helper">Optional. Not used in loss calculations.</div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Run Analysis                                                     -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="run-section">
-    <button class="run-btn" id="run_btn">Run Analysis</button>
-    <div class="cap-toggle">
-      <input type="checkbox" id="apply_asset_cap" checked />
-      <label for="apply_asset_cap">Cap event losses at asset replacement value</label>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Warnings                                                         -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div id="warnings_area"></div>
-  <div id="errors_area"></div>
-
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- Results                                                          -->
-  <!-- ══════════════════════════════════════════════════════════════════ -->
-  <div class="results-area" id="results_area">
-    <div class="results-divider">Results</div>
-
-    <!-- Card 1 — Broker / Underwriter Summary -->
-    <div class="result-card primary" id="card_broker">
-      <h3>Broker / Underwriter Summary</h3>
-      <p class="summary-text" id="broker_summary_text"></p>
-    </div>
-
-    <!-- Card 2 — Insurance Effect -->
-    <div class="result-card" id="card_insurance">
-      <h3>Insurance Effect</h3>
-      <div class="kpi-row" id="insurance_kpis"></div>
-    </div>
-
-    <!-- Card 3 — Physical Effect -->
-    <div class="result-card" id="card_physical">
-      <h3>Physical Effect (Gross Loss)</h3>
-      <div class="kpi-row" id="physical_kpis"></div>
-    </div>
-
-    <!-- Card 4 — Uninsured / Retained -->
-    <div class="result-card" id="card_uninsured">
-      <h3>Uninsured / Retained</h3>
-      <div class="kpi-row" id="uninsured_kpis"></div>
-    </div>
-
-    <!-- Card 5 — Policy Relevance -->
-    <div class="result-card" id="card_policy_relevance">
-      <h3>Policy Relevance</h3>
-      <p class="relevance-text" id="policy_relevance_text"></p>
-    </div>
-
-    <!-- Card 6 — EP Curves -->
-    <div class="chart-row">
-      <div class="chart-container">
-        <h3>Gross Loss EP Curve</h3>
-        <div id="chart_gross_ep" style="height:320px;"></div>
-      </div>
-      <div class="chart-container">
-        <h3>Insured Loss EP Curve</h3>
-        <div id="chart_insured_ep" style="height:320px;"></div>
-      </div>
-    </div>
-
-    <!-- Card 7 — Event Table (collapsed) -->
-    <div class="event-table-section">
-      <button class="toggle-btn" id="toggle_event_table">&#9654; Show event-level detail</button>
-      <div class="event-table-wrap" id="event_table_wrap">
-        <table class="event-table" id="event_table">
-          <thead id="event_table_head"></thead>
-          <tbody id="event_table_body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Capped notice -->
-    <div class="alert alert-warning" id="cap_notice" style="display:none; margin-top: 16px;">
-      One or more event losses were capped at the stated asset replacement value.
-    </div>
-  </div>
-
-</div>
+</div><!-- /layout -->
 
 <script src="/static/app.js"></script>
 </body>

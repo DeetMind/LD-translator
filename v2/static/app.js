@@ -348,8 +348,9 @@ function renderResults(data) {
   // ── Cap notice ──────────────────────────────────────────────────────
   $("cap_notice").style.display = data.was_capped_by_asset_value ? "block" : "none";
 
-  // Show results
+  // Show results, hide placeholder
   $("results_area").classList.add("visible");
+  if ($("results_placeholder")) $("results_placeholder").style.display = "none";
   $("results_area").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
