@@ -1,11 +1,11 @@
 """
-Vercel serverless entry point.
-Re-exports the FastAPI app for Vercel's Python runtime.
+Vercel serverless entry point for LDT v2.
 """
 import sys
 from pathlib import Path
 
-# Ensure the project root is on the path so engine/ imports work
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Add v2/ to the path so engine/ and main imports work
+v2_dir = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(v2_dir))
 
 from main import app
