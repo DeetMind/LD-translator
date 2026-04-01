@@ -6,8 +6,6 @@
     }
   ],
   "routes": [
-    { "src": "/api/v2/(.*)", "dest": "v2/api/index" },
-    { "src": "/static/(.*)", "dest": "v2/static/$1" },
-    { "src": "/", "dest": "v2/static/index.html" }
+    { "src": "/(.*)", "dest": "v2/api/index.py" }
   ]
 }
