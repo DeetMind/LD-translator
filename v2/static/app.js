@@ -300,7 +300,7 @@ function renderResults(data) {
   // ── Card 1 — Broker summary ──────────────────────────────────────────
   $("broker_summary_text").textContent = data.broker_summary;
 
-  // ── Card 2 — Insurance effect ────────────────────────────────────────
+  // ── Card 2 — Insurance effect (highlighted) ──────────────────────────
   $("insurance_kpis").innerHTML = kpiRow([
     { label: "Baseline Insured EAL", value: fmtUsd(m.baseline_insured_eal_usd) },
     { label: "Adjusted Insured EAL", value: fmtUsd(m.adjusted_insured_eal_usd) },
@@ -309,6 +309,7 @@ function renderResults(data) {
       value: fmtUsd(m.avoided_insured_eal_usd),
       sub: fmtPct(m.insured_reduction_pct) + " reduction",
       delta: "good",
+      hero: true,
     },
   ]);
 
@@ -362,9 +363,10 @@ function renderResults(data) {
 function kpiRow(items) {
   return items.map((item) => {
     const deltaClass = item.delta ? `delta-${item.delta}` : "";
+    const heroClass = item.hero ? " kpi-hero" : "";
     const sub = item.sub ? `<div class="kpi-sub ${deltaClass}">${item.sub}</div>` : "";
     return `
-      <div class="kpi">
+      <div class="kpi${heroClass}">
         <div class="kpi-label">${item.label}</div>
         <div class="kpi-value ${deltaClass}">${item.value}</div>
         ${sub}
@@ -443,3 +445,49 @@ function renderEventTable(events) {
 // ── Init ────────────────────────────────────────────────────────────────
 updateDeductibleFields();
 updateEffectiveReduction();
+
+// Auto-load sample scenario and run analysis on page load
+(async function autoLoad() {
+  try {
+    // Trigger the sample load
+    const resp = await fetch(API_BASE + "/api/v2/sample-data");
+    const data = await resp.json();
+
+    csvText = data.csv;
+    csvFileName = "sample_hail_scenario.csv";
+    $("upload_area").classList.add("has-file");
+    $("file_name").textContent = csvFileName;
+    $("file_name").style.display = "block";
+    $("upload_area").querySelector(".upload-text").style.display = "none";
+    $("upload_area").querySelector(".upload-icon").style.display = "none";
+
+    const m = data.mitigation;
+    $("intervention_name").value = m.intervention_name || "";
+    $("base_loss_reduction_pct").value = (m.base_loss_reduction_pct * 100).toFixed(0);
+    $("failure_probability").value = (m.failure_probability * 100).toFixed(0);
+    $("maintenance_haircut_pct").value = (m.maintenance_haircut_pct * 100).toFixed(0);
+    $("intervention_cost_usd").value = m.intervention_cost_usd || "";
+    updateEffectiveReduction();
+
+    const p = data.policy;
+    $("coverage_limit_usd").value = p.coverage_limit_usd || "";
+    $("insured_share_mode").value = p.insured_share_mode || "full_policy_inputs";
+    $("insured_share_mode").dispatchEvent(new Event("change"));
+    $("deductible_type").value = p.deductible_type || "percent_of_coverage";
+    updateDeductibleFields();
+    if (p.deductible_type === "flat_usd") {
+      $("deductible_usd").value = p.deductible_usd || "";
+    } else {
+      $("deductible_pct").value = ((p.deductible_pct || 0) * 100).toFixed(0);
+    }
+    $("coinsurance_pct").value = ((p.coinsurance_pct || 1) * 100).toFixed(0);
+    $("premium_usd_current").value = p.premium_usd_current || "";
+    updateDerivedDeductible();
+
+    // Auto-run analysis
+    await runAnalysis();
+  } catch (e) {
+    // Silently fail — user can manually load and run
+    console.warn("Auto-load failed:", e);
+  }
+})();
