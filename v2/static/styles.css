@@ -329,7 +329,6 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 8px;
 }
 
 /* ── Result cards ─────────────────────────────────────────────────── */
