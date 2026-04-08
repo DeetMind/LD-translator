@@ -40,6 +40,7 @@
 
   <!-- ════ LEFT PANE — Inputs ════════════════════════════════════════ -->
   <div class="pane-left">
+    <div class="pane-header">Inputs</div>
 
     <!-- Asset & Hazard -->
     <section class="sec">
@@ -127,47 +128,44 @@
 
   <!-- ════ RIGHT PANE — Results ══════════════════════════════════════ -->
   <div class="pane-right">
+    <div class="pane-header">Results</div>
 
     <div id="warnings_area"></div>
     <div id="errors_area"></div>
 
     <div class="results-area" id="results_area">
 
-      <!-- Broker summary -->
-      <div class="res-card res-primary" id="card_broker">
-        <h3>Broker / Underwriter Summary</h3>
-        <p class="summary-text" id="broker_summary_text"></p>
+      <!-- Top row: Broker summary + Policy relevance side by side -->
+      <div class="top-cards-row">
+        <div class="res-card res-primary" id="card_broker">
+          <h3>Broker / Underwriter Summary</h3>
+          <p class="summary-text" id="broker_summary_text"></p>
+        </div>
+        <div class="res-card" id="card_policy_relevance">
+          <h3>Policy Relevance</h3>
+          <p class="relevance-text" id="policy_relevance_text"></p>
+        </div>
       </div>
 
-      <!-- Insurance Effect -->
-      <div class="res-card res-highlight" id="card_insurance">
+      <!-- Metric cards -->
+      <div class="res-card res-highlight res-compact" id="card_insurance">
         <h3>Insurance Effect</h3>
         <div class="kpi-row" id="insurance_kpis"></div>
       </div>
 
-      <!-- Physical Effect -->
-      <div class="res-card" id="card_physical">
+      <div class="res-card res-compact" id="card_physical">
         <h3>Physical Effect (Gross Loss)</h3>
         <div class="kpi-row" id="physical_kpis"></div>
       </div>
 
-      <!-- Uninsured / Retained -->
-      <div class="res-card" id="card_uninsured">
+      <div class="res-card res-compact" id="card_uninsured">
         <h3>Uninsured / Retained</h3>
         <div class="kpi-row" id="uninsured_kpis"></div>
       </div>
 
-      <!-- Policy Relevance -->
-      <div class="res-card" id="card_policy_relevance">
-        <h3>Policy Relevance</h3>
-        <p class="relevance-text" id="policy_relevance_text"></p>
-      </div>
-
-      <!-- EP Curves -->
-      <div class="ep-row">
-        <div class="ep-chart"><h3>Gross Loss EP Curve</h3><div id="chart_gross_ep" style="height:260px;"></div></div>
-        <div class="ep-chart"><h3>Insured Loss EP Curve</h3><div id="chart_insured_ep" style="height:260px;"></div></div>
-      </div>
+      <!-- EP Curves — stacked -->
+      <div class="ep-chart"><h3>Gross Loss EP Curve</h3><div id="chart_gross_ep" style="height:240px;"></div></div>
+      <div class="ep-chart"><h3>Insured Loss EP Curve</h3><div id="chart_insured_ep" style="height:240px;"></div></div>
 
       <!-- Event Table -->
       <div class="evt-section">
