@@ -378,20 +378,22 @@ function renderEpChart(elId, baseline, adjusted, title) {
     marker: { size: 5 },
   };
   const layout = {
-    margin: { t: 10, r: 20, b: 50, l: 70 },
+    margin: { t: 8, r: 10, b: 40, l: 10 },
     xaxis: {
-      title: "Exceedance Probability",
+      title: { text: "Exceedance Probability", font: { size: 10 } },
       type: "log",
       autorange: true,
       gridcolor: "#eee",
+      automargin: true,
     },
     yaxis: {
-      title: title + " ($)",
+      title: { text: title + " ($)", font: { size: 10 } },
       tickprefix: "$",
       gridcolor: "#eee",
+      automargin: true,
     },
-    legend: { x: 0.01, y: 0.99, bgcolor: "rgba(255,255,255,0.8)" },
-    font: { family: "-apple-system, BlinkMacSystemFont, sans-serif", size: 11 },
+    legend: { x: 0.02, y: 0.98, bgcolor: "rgba(255,255,255,0.8)", font: { size: 9 } },
+    font: { family: "-apple-system, BlinkMacSystemFont, sans-serif", size: 10 },
     plot_bgcolor: "#fff",
     paper_bgcolor: "#fff",
   };

@@ -467,6 +467,12 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   padding: 8px 10px;
   box-shadow: var(--shadow);
   min-width: 0;
+  overflow: hidden;
+}
+.ep-chart .js-plotly-plot,
+.ep-chart .plot-container,
+.ep-chart .svg-container {
+  width: 100% !important;
 }
 .ep-chart h3 {
   font-size: 10px;
