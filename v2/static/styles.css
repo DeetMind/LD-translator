@@ -454,14 +454,19 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
 
 /* ── EP charts ────────────────────────────────────────────────────── */
 
-.ep-chart {
+.ep-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   margin-bottom: 8px;
+}
+.ep-chart {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 8px 10px;
   box-shadow: var(--shadow);
-  display: inline-block;
+  min-width: 0;
 }
 .ep-chart h3 {
   font-size: 10px;
@@ -530,6 +535,7 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   }
   .faq-wrap { columns: 1; }
   .top-cards-row { grid-template-columns: 1fr; }
+  .ep-row { grid-template-columns: 1fr; }
   .kpi-row { grid-template-columns: repeat(3, 1fr); }
 }
 
