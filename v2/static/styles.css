@@ -363,11 +363,18 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
 }
 
 /* Consolidated metrics table */
-.metrics-table-card { padding: 8px 10px; }
+.metrics-table-card {
+  padding: 8px 10px;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
 .metrics-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11px;
 }
 .metrics-table th {
   font-size: 9px;
@@ -375,13 +382,13 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   letter-spacing: 0.04em;
   color: var(--muted);
   font-weight: 600;
-  padding: 3px 8px;
+  padding: 2px 6px;
   text-align: right;
   border-bottom: 1px solid var(--border);
 }
 .metrics-table th:first-child { text-align: left; }
 .metrics-table td {
-  padding: 5px 8px;
+  padding: 3px 6px;
   text-align: right;
   border-bottom: 1px solid #f0f2f5;
   font-variant-numeric: tabular-nums;
