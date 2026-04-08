@@ -378,7 +378,7 @@ function renderEpChart(elId, baseline, adjusted, title) {
     marker: { size: 5 },
   };
   const layout = {
-    margin: { t: 8, r: 10, b: 40, l: 10 },
+    margin: { t: 10, r: 15, b: 45, l: 60 },
     xaxis: {
       title: { text: "Exceedance Probability", font: { size: 10 } },
       type: "log",
@@ -397,7 +397,10 @@ function renderEpChart(elId, baseline, adjusted, title) {
     plot_bgcolor: "#fff",
     paper_bgcolor: "#fff",
   };
-  Plotly.newPlot(elId, [traceBase, traceAdj], layout, { responsive: true });
+  const el = document.getElementById(elId);
+  Plotly.newPlot(el, [traceBase, traceAdj], layout, { responsive: true }).then(() => {
+    Plotly.Plots.resize(el);
+  });
 }
 
 
