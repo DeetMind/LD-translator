@@ -8,9 +8,14 @@ import anthropic
 import os
 import sys
 
-# ── PASTE YOUR API KEY HERE ───────────────────────────────────────────────────
-API_KEY = "REMOVED_SECRET"
+# ── API KEY ───────────────────────────────────────────────────────────────────
+# Set ANTHROPIC_API_KEY in your environment, e.g.:
+#   export ANTHROPIC_API_KEY="sk-ant-..."
 # ─────────────────────────────────────────────────────────────────────────────
+API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+if not API_KEY:
+    sys.exit("Error: Set ANTHROPIC_API_KEY environment variable before running."
+             "\n  export ANTHROPIC_API_KEY=\"sk-ant-...\"")
 
 client = anthropic.Anthropic(api_key=API_KEY)
 
