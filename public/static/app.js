@@ -394,7 +394,7 @@ function renderEpChart(elId, baseline, adjusted, title) {
       gridcolor: "#eee",
       automargin: true,
     },
-    legend: { x: 0.98, y: 0.02, xanchor: "right", yanchor: "bottom", bgcolor: "rgba(255,255,255,0.85)", bordercolor: "#e0e3e8", borderwidth: 1, font: { size: 9 } },
+    legend: { x: 0.95, y: 0.85, xanchor: "right", yanchor: "top", bgcolor: "rgba(255,255,255,0.85)", bordercolor: "#e0e3e8", borderwidth: 1, font: { size: 9 } },
     font: { family: "-apple-system, BlinkMacSystemFont, sans-serif", size: 10 },
     plot_bgcolor: "#fff",
     paper_bgcolor: "#fff",
