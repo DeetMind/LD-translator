@@ -40,7 +40,7 @@
 
   <!-- ════ LEFT PANE — Inputs ════════════════════════════════════════ -->
   <div class="pane-left">
-    <div class="pane-header">Inputs</div>
+    <div class="pane-header">Inputs <span class="pane-hint">scroll down to run analysis</span></div>
 
     <!-- Asset & Hazard -->
     <section class="sec">
@@ -147,20 +147,20 @@
         </div>
       </div>
 
-      <!-- Metric cards -->
-      <div class="res-card res-highlight res-compact" id="card_insurance">
-        <h3>Insurance Effect</h3>
-        <div class="kpi-row" id="insurance_kpis"></div>
-      </div>
-
-      <div class="res-card res-compact" id="card_physical">
-        <h3>Physical Effect (Gross Loss)</h3>
-        <div class="kpi-row" id="physical_kpis"></div>
-      </div>
-
-      <div class="res-card res-compact" id="card_uninsured">
-        <h3>Uninsured / Retained</h3>
-        <div class="kpi-row" id="uninsured_kpis"></div>
+      <!-- Consolidated metrics table -->
+      <div class="res-card metrics-table-card" id="card_metrics">
+        <h3>EAL Metrics</h3>
+        <table class="metrics-table" id="metrics_table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Baseline</th>
+              <th>Mitigated</th>
+              <th>Avoided</th>
+            </tr>
+          </thead>
+          <tbody id="metrics_table_body"></tbody>
+        </table>
       </div>
 
       <!-- EP Curves — stacked -->

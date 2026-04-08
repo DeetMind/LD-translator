@@ -300,41 +300,26 @@ function renderResults(data) {
   // ── Card 1 — Broker summary ──────────────────────────────────────────
   $("broker_summary_text").textContent = data.broker_summary;
 
-  // ── Card 2 — Insurance effect (highlighted) ──────────────────────────
-  $("insurance_kpis").innerHTML = kpiRow([
-    { label: "Baseline Insured EAL", value: fmtUsd(m.baseline_insured_eal_usd) },
-    { label: "Adjusted Insured EAL", value: fmtUsd(m.adjusted_insured_eal_usd) },
-    {
-      label: "Avoided Insured Loss",
-      value: fmtUsd(m.avoided_insured_eal_usd),
-      sub: fmtPct(m.insured_reduction_pct) + " reduction",
-      delta: "good",
-      hero: true,
-    },
-  ]);
-
-  // ── Card 3 — Physical effect ─────────────────────────────────────────
-  $("physical_kpis").innerHTML = kpiRow([
-    { label: "Baseline Gross EAL", value: fmtUsd(m.baseline_gross_eal_usd) },
-    { label: "Adjusted Gross EAL", value: fmtUsd(m.adjusted_gross_eal_usd) },
-    {
-      label: "Avoided Gross Loss",
-      value: fmtUsd(m.avoided_gross_eal_usd),
-      sub: fmtPct(m.hazard_specific_reduction_pct) + " reduction",
-      delta: "good",
-    },
-  ]);
-
-  // ── Card 4 — Uninsured / retained ───────────────────────────────────
-  $("uninsured_kpis").innerHTML = kpiRow([
-    { label: "Baseline Uninsured EAL", value: fmtUsd(m.baseline_uninsured_eal_usd) },
-    { label: "Adjusted Uninsured EAL", value: fmtUsd(m.adjusted_uninsured_eal_usd) },
-    {
-      label: "Change in Uninsured EAL",
-      value: fmtUsd(m.avoided_uninsured_eal_usd),
-      delta: m.avoided_uninsured_eal_usd >= 0 ? "good" : "neutral",
-    },
-  ]);
+  // ── Consolidated metrics table ────────────────────────────────────────
+  $("metrics_table_body").innerHTML = `
+    <tr class="row-highlight">
+      <td class="row-label">Insured Loss</td>
+      <td>${fmtUsd(m.baseline_insured_eal_usd)}</td>
+      <td>${fmtUsd(m.adjusted_insured_eal_usd)}</td>
+      <td class="delta-good">${fmtUsd(m.avoided_insured_eal_usd)} <span class="tbl-sub">(${fmtPct(m.insured_reduction_pct)})</span></td>
+    </tr>
+    <tr>
+      <td class="row-label">Gross Loss</td>
+      <td>${fmtUsd(m.baseline_gross_eal_usd)}</td>
+      <td>${fmtUsd(m.adjusted_gross_eal_usd)}</td>
+      <td class="delta-good">${fmtUsd(m.avoided_gross_eal_usd)} <span class="tbl-sub">(${fmtPct(m.hazard_specific_reduction_pct)})</span></td>
+    </tr>
+    <tr>
+      <td class="row-label">Uninsured / Retained</td>
+      <td>${fmtUsd(m.baseline_uninsured_eal_usd)}</td>
+      <td>${fmtUsd(m.adjusted_uninsured_eal_usd)}</td>
+      <td class="${m.avoided_uninsured_eal_usd >= 0 ? 'delta-good' : 'delta-neutral'}">${fmtUsd(m.avoided_uninsured_eal_usd)}</td>
+    </tr>`;
 
   // ── Card 5 — Policy relevance ───────────────────────────────────────
   $("policy_relevance_text").textContent = data.policy_relevance_note;
