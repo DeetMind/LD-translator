@@ -28,6 +28,7 @@ def generate_broker_summary(
     intervention_name: str = "This intervention",
     hazard_label: str = "hail",
     hazard_share_pct: float | None = None,
+    reinsurance_layers: list[dict] | None = None,
 ) -> str:
     """
     Generate a plain-language summary for the broker / underwriter card.
@@ -77,6 +78,17 @@ def generate_broker_summary(
             "A significant portion of avoided loss sits below the deductible "
             "or outside the insured layer."
         )
+
+    # Sentence 5 — Reinsurance (conditional)
+    if reinsurance_layers:
+        material = [l for l in reinsurance_layers if l["ell_reduction_pct"] > 0]
+        if material:
+            best = max(material, key=lambda l: l["ell_reduction_pct"])
+            sentences.append(
+                f"Reinsurance layer at {_fmt_usd(best['attach_usd'])} xs "
+                f"{_fmt_usd(best['limit_usd'])} sees a "
+                f"{best['ell_reduction_pct']:.0f}% reduction in expected layer loss."
+            )
 
     return " ".join(sentences)
 

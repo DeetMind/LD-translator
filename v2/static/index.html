@@ -104,6 +104,13 @@
         <div class="fg"><label for="coinsurance_pct">Coinsurance (%)</label><input type="number" id="coinsurance_pct" value="100" min="0" max="100" step="1" /><span class="helper">Future use. Does not alter calculations.</span></div>
         <div class="fg"><label for="premium_usd_current">Premium ($/yr)</label><input type="number" id="premium_usd_current" placeholder="Optional" min="0" step="100" /><span class="helper">Informational only.</span></div>
       </div>
+
+      <!-- Reinsurance layers -->
+      <div class="reins-section">
+        <label class="reins-label">Reinsurance Layers <span class="helper">(optional)</span></label>
+        <div id="reins_layers"></div>
+        <button type="button" class="btn-sm" id="add_reins_layer">+ Add Layer</button>
+      </div>
     </section>
 
     <!-- Mitigation -->
@@ -161,6 +168,24 @@
             </tr>
           </thead>
           <tbody id="metrics_table_body"></tbody>
+        </table>
+      </div>
+
+      <!-- Reinsurance layer results (hidden if no layers) -->
+      <div class="res-card" id="card_reinsurance" style="display:none;">
+        <h3>Reinsurance Layer Impact</h3>
+        <table class="metrics-table" id="reins_table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Base ELL</th>
+              <th>Mitig. ELL</th>
+              <th>Reduction</th>
+              <th>Base LOL</th>
+              <th>Mitig. LOL</th>
+            </tr>
+          </thead>
+          <tbody id="reins_table_body"></tbody>
         </table>
       </div>
 

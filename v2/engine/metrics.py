@@ -123,3 +123,51 @@ def compute_summary_metrics(df: pd.DataFrame, asset: dict) -> dict:
             "insured_adjusted": adjusted_insured_ep,
         },
     }
+
+
+# ── Reinsurance layer metrics ──────────────────────────────────────────
+
+def compute_reinsurance_layer_metrics(
+    prob: pd.Series,
+    baseline_loss: pd.Series,
+    adjusted_loss: pd.Series,
+    layers: list[dict],
+) -> list[dict]:
+    """
+    For each reinsurance layer {attach_usd, limit_usd}, compute:
+      - layer_loss = min(max(loss - attach, 0), limit)
+      - ELL (expected layer loss) = sum(prob * layer_loss)
+      - LOL (loss on line) = ELL / limit
+
+    Returns list of dicts with baseline and mitigated metrics per layer.
+    """
+    results = []
+    for layer in layers:
+        attach = layer["attach_usd"]
+        limit = layer["limit_usd"]
+
+        # Baseline
+        bl_layer_loss = np.minimum(np.maximum(baseline_loss - attach, 0), limit)
+        bl_ell = float((prob * bl_layer_loss).sum())
+        bl_lol = bl_ell / limit if limit > 0 else 0
+
+        # Mitigated
+        adj_layer_loss = np.minimum(np.maximum(adjusted_loss - attach, 0), limit)
+        adj_ell = float((prob * adj_layer_loss).sum())
+        adj_lol = adj_ell / limit if limit > 0 else 0
+
+        # Reduction
+        ell_reduction_pct = (
+            (bl_ell - adj_ell) / bl_ell * 100 if bl_ell > 0 else 0
+        )
+
+        results.append({
+            "attach_usd": attach,
+            "limit_usd": limit,
+            "baseline_ell_usd": round(bl_ell, 2),
+            "baseline_lol_pct": round(bl_lol * 100, 2),
+            "mitigated_ell_usd": round(adj_ell, 2),
+            "mitigated_lol_pct": round(adj_lol * 100, 2),
+            "ell_reduction_pct": round(ell_reduction_pct, 1),
+        })
+    return results

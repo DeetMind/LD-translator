@@ -7,6 +7,9 @@
   "insured_share_pct": null,
   "coinsurance_pct": 1.00,
   "premium_usd_current": 2400,
+  "reinsurance_layers": [
+    { "attach_usd": 200000, "limit_usd": 175000 }
+  ],
 
   "_notes": {
     "purpose": "Illustrative residential property / homeowners-style policy for the hail demo.",

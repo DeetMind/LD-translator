@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 import pandas as pd
 import json
 import io
@@ -21,7 +21,7 @@ from pathlib import Path
 from engine.validation import validate_scenario, apply_asset_value_cap
 from engine.mitigation import adjust_event_losses, compute_effective_reduction
 from engine.insurance import map_to_insured_losses, resolve_deductible
-from engine.metrics import compute_summary_metrics
+from engine.metrics import compute_summary_metrics, compute_reinsurance_layer_metrics
 from engine.summaries import generate_broker_summary, generate_policy_relevance_note
 
 app = FastAPI(title="Loss Distribution Translator v2")
@@ -46,6 +46,10 @@ class AssetInput(BaseModel):
     location_name: str = ""
     hazard_share_pct: Optional[float] = None   # 0–1 or None
 
+class ReinsuranceLayerInput(BaseModel):
+    attach_usd: float
+    limit_usd: float
+
 class PolicyInput(BaseModel):
     coverage_limit_usd: float = 375000
     deductible_type: str = "percent_of_coverage"   # flat_usd | percent_of_coverage
@@ -55,6 +59,7 @@ class PolicyInput(BaseModel):
     insured_share_pct: Optional[float] = None
     coinsurance_pct: Optional[float] = 1.0
     premium_usd_current: Optional[float] = None
+    reinsurance_layers: Optional[List[ReinsuranceLayerInput]] = None
 
 class InterventionInput(BaseModel):
     intervention_name: str = "Impact-Resistant Roof Upgrade (Class 4)"
@@ -119,6 +124,18 @@ async def analyze(request: AnalysisRequest):
     # Step 3 — Summary metrics
     metrics = compute_summary_metrics(df, asset)
 
+    # Step 3b — Reinsurance layer metrics (optional)
+    reinsurance_results = None
+    layers_input = policy.get("reinsurance_layers")
+    if layers_input:
+        layers = [{"attach_usd": l["attach_usd"], "limit_usd": l["limit_usd"]} for l in layers_input]
+        reinsurance_results = compute_reinsurance_layer_metrics(
+            df["annual_probability"],
+            df["gross_loss_usd"],
+            df["adjusted_gross_loss_usd"],
+            layers,
+        )
+
     # Step 4 — Plain-language summaries
     effective_reduction = compute_effective_reduction(
         intervention["base_loss_reduction_pct"],
@@ -131,6 +148,7 @@ async def analyze(request: AnalysisRequest):
         intervention_name=intervention.get("intervention_name", "This intervention"),
         hazard_label="hail",
         hazard_share_pct=asset.get("hazard_share_pct"),
+        reinsurance_layers=reinsurance_results,
     )
 
     policy_relevance_note = generate_policy_relevance_note(metrics)
@@ -156,6 +174,7 @@ async def analyze(request: AnalysisRequest):
         "was_capped_by_asset_value": was_capped,
         "warnings": validation["warnings"],
         "event_table": event_table.to_dict(orient="records"),
+        "reinsurance_layers": reinsurance_results,
     })
 
 

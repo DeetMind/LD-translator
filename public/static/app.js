@@ -164,6 +164,12 @@ $("load_sample_btn").addEventListener("click", async () => {
     $("premium_usd_current").value = p.premium_usd_current || "";
     updateDerivedDeductible();
 
+    // Load reinsurance layers
+    $("reins_layers").innerHTML = "";
+    if (p.reinsurance_layers && p.reinsurance_layers.length > 0) {
+      p.reinsurance_layers.forEach((l) => addReinsLayer(l.attach_usd, l.limit_usd));
+    }
+
   } catch (e) {
     alert("Failed to load sample data: " + e.message);
   }
@@ -188,6 +194,37 @@ $("toggle_event_table").addEventListener("click", function () {
   this.innerHTML = (visible ? "&#9660;" : "&#9654;") + " " +
     (visible ? "Hide" : "Show") + " event-level detail";
 });
+
+
+// ── Reinsurance layer inputs ────────────────────────────────────────────
+let reinsLayerId = 0;
+
+function addReinsLayer(attach = "", limit = "") {
+  const id = reinsLayerId++;
+  const row = document.createElement("div");
+  row.className = "reins-row";
+  row.id = `reins_row_${id}`;
+  row.innerHTML = `
+    <input type="number" placeholder="Attachment ($)" class="reins-attach" value="${attach}" min="0" step="1000" />
+    <input type="number" placeholder="Limit ($)" class="reins-limit" value="${limit}" min="0" step="1000" />
+    <button type="button" class="btn-sm btn-ghost reins-remove" data-id="${id}">&times;</button>
+  `;
+  $("reins_layers").appendChild(row);
+  row.querySelector(".reins-remove").addEventListener("click", () => row.remove());
+}
+
+$("add_reins_layer").addEventListener("click", () => addReinsLayer());
+
+function getReinsLayers() {
+  const rows = $("reins_layers").querySelectorAll(".reins-row");
+  const layers = [];
+  rows.forEach((row) => {
+    const a = parseFloat(row.querySelector(".reins-attach").value);
+    const l = parseFloat(row.querySelector(".reins-limit").value);
+    if (a >= 0 && l > 0) layers.push({ attach_usd: a, limit_usd: l });
+  });
+  return layers.length > 0 ? layers : null;
+}
 
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -237,6 +274,7 @@ async function runAnalysis() {
       insured_share_pct: !isFullPolicy ? (parseFloat($("insured_share_pct").value) || 0) / 100 : null,
       coinsurance_pct: (parseFloat($("coinsurance_pct").value) || 100) / 100,
       premium_usd_current: parseFloat($("premium_usd_current").value) || null,
+      reinsurance_layers: getReinsLayers(),
     },
     intervention: {
       intervention_name: $("intervention_name").value,
@@ -323,6 +361,24 @@ function renderResults(data) {
 
   // ── Card 5 — Policy relevance ───────────────────────────────────────
   $("policy_relevance_text").textContent = data.policy_relevance_note;
+
+  // ── Reinsurance layer results ──────────────────────────────────────
+  if (data.reinsurance_layers && data.reinsurance_layers.length > 0) {
+    $("card_reinsurance").style.display = "block";
+    $("reins_table_body").innerHTML = data.reinsurance_layers.map((l) => {
+      const label = fmtUsd(l.limit_usd) + " xs " + fmtUsd(l.attach_usd);
+      return `<tr>
+        <td class="row-label">${label}</td>
+        <td>${fmtUsd(l.baseline_ell_usd)}</td>
+        <td>${fmtUsd(l.mitigated_ell_usd)}</td>
+        <td class="delta-good">${fmtPct(l.ell_reduction_pct)}</td>
+        <td>${fmtPct(l.baseline_lol_pct)}</td>
+        <td>${fmtPct(l.mitigated_lol_pct)}</td>
+      </tr>`;
+    }).join("");
+  } else {
+    $("card_reinsurance").style.display = "none";
+  }
 
   // ── Card 6 — EP curves ──────────────────────────────────────────────
   renderEpChart("chart_gross_ep", m.ep_curves.gross_baseline, m.ep_curves.gross_adjusted, "Gross Loss");
