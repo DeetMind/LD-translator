@@ -72,9 +72,22 @@
       </div>
     </section>
 
-    <!-- 3. Policy Layer -->
+    <!-- 3. Mitigation -->
     <section class="sec sec-numbered">
-      <h2><span class="sec-num">3</span> Policy Layer</h2>
+      <h2><span class="sec-num">3</span> Mitigation</h2>
+      <div class="fg"><label for="intervention_name">Intervention</label><input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" /></div>
+      <div class="row-3">
+        <div class="fg"><label for="base_loss_reduction_pct">Base Reduction (%)</label><input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" /></div>
+        <div class="fg"><label for="failure_probability">Failure Prob. (%)</label><input type="number" id="failure_probability" value="5" min="0" max="100" step="1" /></div>
+        <div class="fg"><label for="maintenance_haircut_pct">Maint. Haircut (%)</label><input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" /></div>
+      </div>
+      <div class="derived-val eff-val" id="effective_reduction_display">Effective Reduction: <strong id="effective_reduction_value">29.9%</strong></div>
+      <div class="fg"><label for="intervention_cost_usd">Cost ($)</label><input type="number" id="intervention_cost_usd" value="12000" min="0" step="500" /><span class="helper">Not used in loss calculations.</span></div>
+    </section>
+
+    <!-- 4. Policy Layer -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">4</span> Policy Layer</h2>
       <div class="row-2">
         <div class="fg"><label for="insured_share_mode">Policy Mode</label>
           <select id="insured_share_mode">
@@ -106,25 +119,12 @@
       </div>
     </section>
 
-    <!-- 4. Reinsurance -->
+    <!-- 5. Reinsurance -->
     <section class="sec sec-numbered">
-      <h2><span class="sec-num">4</span> Reinsurance <span class="sec-optional">(optional)</span></h2>
+      <h2><span class="sec-num">5</span> Reinsurance <span class="sec-optional">(optional)</span></h2>
       <p class="sec-note">Add excess-of-loss layers to see how mitigation affects ceded risk.</p>
       <div id="reins_layers"></div>
       <button type="button" class="btn-sm" id="add_reins_layer">+ Add Layer</button>
-    </section>
-
-    <!-- 5. Mitigation -->
-    <section class="sec sec-numbered">
-      <h2><span class="sec-num">5</span> Mitigation</h2>
-      <div class="fg"><label for="intervention_name">Intervention</label><input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" /></div>
-      <div class="row-3">
-        <div class="fg"><label for="base_loss_reduction_pct">Base Reduction (%)</label><input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" /></div>
-        <div class="fg"><label for="failure_probability">Failure Prob. (%)</label><input type="number" id="failure_probability" value="5" min="0" max="100" step="1" /></div>
-        <div class="fg"><label for="maintenance_haircut_pct">Maint. Haircut (%)</label><input type="number" id="maintenance_haircut_pct" value="10" min="0" max="100" step="1" /></div>
-      </div>
-      <div class="derived-val eff-val" id="effective_reduction_display">Effective Reduction: <strong id="effective_reduction_value">29.9%</strong></div>
-      <div class="fg"><label for="intervention_cost_usd">Cost ($)</label><input type="number" id="intervention_cost_usd" value="12000" min="0" step="500" /><span class="helper">Not used in loss calculations.</span></div>
     </section>
 
     <!-- Run -->
