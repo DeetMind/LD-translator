@@ -143,6 +143,17 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
 }
 .sec:last-of-type { border-bottom: none; }
 
+.sec-numbered {
+  border-bottom: none;
+  margin-bottom: 6px;
+  background: var(--panel);
+  border-radius: 0;
+  position: relative;
+}
+.sec-numbered + .sec-numbered {
+  border-top: 4px solid var(--bg);
+}
+
 .sec h2 {
   font-size: 10px;
   font-weight: 700;
@@ -150,6 +161,31 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   letter-spacing: 0.07em;
   color: var(--accent);
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sec-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sec-optional {
+  font-weight: 400;
+  text-transform: none;
+  color: var(--light);
+  font-size: 9px;
+  letter-spacing: 0;
 }
 
 .sec-note {

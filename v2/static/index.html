@@ -43,22 +43,9 @@
   <div class="pane-left">
     <div class="pane-header">Inputs <span class="pane-hint">(scroll down to run analysis)</span></div>
 
-    <!-- Asset & Hazard -->
-    <section class="sec">
-      <h2>Asset &amp; Hazard</h2>
-      <div class="row-2">
-        <div class="fg"><label for="asset_name">Property Name</label><input type="text" id="asset_name" value="Sample Residential Property" /></div>
-        <div class="fg"><label for="location_name">Location</label><input type="text" id="location_name" placeholder="e.g., Oklahoma City, OK" /></div>
-      </div>
-      <div class="row-2">
-        <div class="fg"><label for="asset_value_usd">Replacement Value ($)</label><input type="number" id="asset_value_usd" value="375000" min="0" step="1000" /></div>
-        <div class="fg"><label for="hazard_share_pct">Hail Share of Total Risk (%)</label><input type="number" id="hazard_share_pct" placeholder="e.g., 40" min="0" max="100" step="1" /><span class="helper">Optional. Leave blank for hail-specific results only.</span></div>
-      </div>
-    </section>
-
-    <!-- Event Loss Upload -->
-    <section class="sec">
-      <h2>Event Loss Inputs</h2>
+    <!-- 1. Event Loss Upload -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">1</span> Event Loss Inputs</h2>
       <p class="sec-note">CSV: event_id, annual_probability, return_period, hazard_intensity, gross_loss_usd</p>
       <div class="file-upload-area" id="upload_area">
         <div class="upload-icon">&#128196;</div>
@@ -72,9 +59,22 @@
       </div>
     </section>
 
-    <!-- Policy Layer -->
-    <section class="sec">
-      <h2>Policy Layer</h2>
+    <!-- 2. Asset & Hazard -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">2</span> Asset &amp; Hazard</h2>
+      <div class="row-2">
+        <div class="fg"><label for="asset_name">Property Name</label><input type="text" id="asset_name" value="Sample Residential Property" /></div>
+        <div class="fg"><label for="location_name">Location</label><input type="text" id="location_name" placeholder="e.g., Oklahoma City, OK" /></div>
+      </div>
+      <div class="row-2">
+        <div class="fg"><label for="asset_value_usd">Replacement Value ($)</label><input type="number" id="asset_value_usd" value="375000" min="0" step="1000" /></div>
+        <div class="fg"><label for="hazard_share_pct">Hail Share of Total Risk (%)</label><input type="number" id="hazard_share_pct" placeholder="e.g., 40" min="0" max="100" step="1" /><span class="helper">Optional. Leave blank for hail-specific results only.</span></div>
+      </div>
+    </section>
+
+    <!-- 3. Policy Layer -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">3</span> Policy Layer</h2>
       <div class="row-2">
         <div class="fg"><label for="insured_share_mode">Policy Mode</label>
           <select id="insured_share_mode">
@@ -104,18 +104,19 @@
         <div class="fg"><label for="coinsurance_pct">Coinsurance (%)</label><input type="number" id="coinsurance_pct" value="100" min="0" max="100" step="1" /><span class="helper">Future use. Does not alter calculations.</span></div>
         <div class="fg"><label for="premium_usd_current">Premium ($/yr)</label><input type="number" id="premium_usd_current" placeholder="Optional" min="0" step="100" /><span class="helper">Informational only.</span></div>
       </div>
-
-      <!-- Reinsurance layers -->
-      <div class="reins-section">
-        <label class="reins-label">Reinsurance Layers <span class="helper">(optional)</span></label>
-        <div id="reins_layers"></div>
-        <button type="button" class="btn-sm" id="add_reins_layer">+ Add Layer</button>
-      </div>
     </section>
 
-    <!-- Mitigation -->
-    <section class="sec">
-      <h2>Mitigation &mdash; Roof Upgrade</h2>
+    <!-- 4. Reinsurance -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">4</span> Reinsurance <span class="sec-optional">(optional)</span></h2>
+      <p class="sec-note">Add excess-of-loss layers to see how mitigation affects ceded risk.</p>
+      <div id="reins_layers"></div>
+      <button type="button" class="btn-sm" id="add_reins_layer">+ Add Layer</button>
+    </section>
+
+    <!-- 5. Mitigation -->
+    <section class="sec sec-numbered">
+      <h2><span class="sec-num">5</span> Mitigation</h2>
       <div class="fg"><label for="intervention_name">Intervention</label><input type="text" id="intervention_name" value="Impact-Resistant Roof Upgrade (Class 4)" /></div>
       <div class="row-3">
         <div class="fg"><label for="base_loss_reduction_pct">Base Reduction (%)</label><input type="number" id="base_loss_reduction_pct" value="35" min="0" max="100" step="1" /></div>
