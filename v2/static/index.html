@@ -160,14 +160,14 @@
 
       <!-- Consolidated metrics table -->
       <div class="res-card metrics-table-card" id="card_metrics">
-        <h3>EAL Metrics</h3>
+        <h3>EAL Metrics <span class="card-subtitle">Average annual impact, probability-weighted across all events</span></h3>
         <table class="metrics-table" id="metrics_table">
           <thead>
             <tr>
               <th></th>
               <th>Baseline</th>
               <th>Mitigated</th>
-              <th>Avoided</th>
+              <th>Annual Savings</th>
             </tr>
           </thead>
           <tbody id="metrics_table_body"></tbody>
@@ -194,8 +194,8 @@
 
       <!-- EP Curves — stacked -->
       <div class="ep-row">
-        <div class="ep-chart"><h3>Gross Loss EP Curve</h3><div id="chart_gross_ep" style="height:240px;"></div></div>
-        <div class="ep-chart"><h3>Insured Loss EP Curve</h3><div id="chart_insured_ep" style="height:240px;"></div></div>
+        <div class="ep-chart"><h3>Gross Loss by Severity <span class="card-subtitle">Single-event losses at each exceedance probability</span></h3><div id="chart_gross_ep" style="height:240px;"></div></div>
+        <div class="ep-chart"><h3>Insured Loss by Severity <span class="card-subtitle">Single-event losses at each exceedance probability</span></h3><div id="chart_insured_ep" style="height:240px;"></div></div>
       </div>
 
       <!-- Event Table -->

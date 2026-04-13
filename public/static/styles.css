@@ -422,6 +422,15 @@ header .subtitle { font-size: 11px; opacity: 0.7; }
   margin-bottom: 6px;
 }
 
+.card-subtitle {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--light);
+  font-size: 9px;
+  margin-left: 4px;
+}
+
 .res-primary {
   border-left: 3px solid var(--accent);
   background: var(--accent-light);
