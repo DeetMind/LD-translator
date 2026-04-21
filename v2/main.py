@@ -24,7 +24,7 @@ from engine.insurance import map_to_insured_losses, resolve_deductible
 from engine.metrics import compute_summary_metrics, compute_reinsurance_layer_metrics
 from engine.summaries import generate_broker_summary, generate_policy_relevance_note
 
-app = FastAPI(title="Loss Distribution Translator v2")
+app = FastAPI(title="Loss Distribution Translator")
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,9 +33,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static files (index.html, styles.css, app.js)
+# Serve static files
 STATIC_DIR = Path(__file__).parent / "static"
+STATIC_V3_DIR = Path(__file__).parent / "static_v3"
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+if STATIC_V3_DIR.exists():
+    app.mount("/static_v3", StaticFiles(directory=STATIC_V3_DIR), name="static_v3")
+
+# Mount v3 router
+from router_v3 import router as v3_router
+app.include_router(v3_router)
 
 
 # ── Request / response models ───────────────────────────────────────────

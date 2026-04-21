@@ -1,0 +1,24 @@
+{
+  "archetypes": [
+    {
+      "archetype_id": "small_warehouse_flat_roof",
+      "display_label": "Small Warehouse (Flat Roof)",
+      "asset_class": "sme_commercial",
+      "occupancy_type": "small_warehouse",
+      "roof_system_type": "tpo",
+      "roof_age_years": 10,
+      "asset_value_usd": 1350000,
+      "notes": "Generic small warehouse with TPO flat roof. Mid-life roof age."
+    },
+    {
+      "archetype_id": "small_retail_flat_roof",
+      "display_label": "Small Retail (Flat Roof)",
+      "asset_class": "sme_commercial",
+      "occupancy_type": "small_retail",
+      "roof_system_type": "modified_bitumen",
+      "roof_age_years": 15,
+      "asset_value_usd": 950000,
+      "notes": "Generic small retail with modified bitumen flat roof."
+    }
+  ]
+}

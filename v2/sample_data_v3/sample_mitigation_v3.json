@@ -1,0 +1,26 @@
+{
+  "intervention_name": "Commercial Roof Upgrade (TPO to Impact-Resistant)",
+  "mitigation_mode": "uniform_scalar",
+  "base_loss_reduction_pct": 0.35,
+  "failure_probability": 0.05,
+  "maintenance_haircut_pct": 0.10,
+  "intervention_cost_usd": 45000,
+  "curve_points": null,
+  "assumption_provenance": {
+    "source_type": "expert_judgment",
+    "citation_note": "Illustrative assumptions based on commercial roofing performance literature. Not calibrated to a specific product or standard.",
+    "confidence_level": "medium",
+    "notes": "Placeholder assumptions for the SME hail roof-upgrade demo. Intended to be replaced with project-specific or manufacturer-backed data."
+  },
+  "sensitivity_cases": {
+    "low_reduction_pct": 0.20,
+    "base_reduction_pct": 0.35,
+    "high_reduction_pct": 0.50
+  },
+
+  "_notes": {
+    "purpose": "Illustrative commercial roof mitigation for the SME hail demo.",
+    "curve_points": "Not used in scalar mode. Populate for hazard_intensity_curve mode.",
+    "update_path": "Replace with IBHS or manufacturer-specific data when available."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "coverage_limit_usd": 1350000,
+  "deductible_type": "percent_of_coverage",
+  "deductible_usd": null,
+  "deductible_pct": 0.02,
+  "insured_share_mode": "full_policy_inputs",
+  "insured_share_pct": null,
+  "coinsurance_pct": 1.00,
+  "premium_usd_current": 8500,
+  "reinsurance_layers": [
+    { "attach_usd": 500000, "limit_usd": 850000 }
+  ],
+
+  "_notes": {
+    "purpose": "Illustrative commercial property policy for the SME hail demo.",
+    "deductible": "2% of coverage ($27,000 on a $1.35M limit) — common for commercial property wind/hail.",
+    "coinsurance": "Captured but does not alter calculations in Phase 1.",
+    "premium": "Informational only — not used to estimate premium reduction.",
+    "update_path": "Replace with actual policy terms when available."
+  }
+}
